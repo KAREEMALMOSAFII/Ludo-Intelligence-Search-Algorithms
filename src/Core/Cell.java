@@ -1,8 +1,11 @@
 package Core;
 
+import Utilities.Color;
 import Utilities.Type;
 
 import java.util.List;
+
+import static Utilities.Color.*;
 
 public class Cell {
     private int posX;
@@ -13,11 +16,31 @@ public class Cell {
 
     private Type type;
 
+    private String text;
 
-    public Cell(int posX, int posY, Type type) {
+    public Cell(int posX, int posY, Type type , Color color) {
         this.posX = posX;
         this.posY = posY;
         this.type = type;
+        switch (color) {
+            case RED:
+                text = "\uD83D\uDFE5";
+                break;
+            case YELLOW:
+                text = "\uD83D\uDFE8";
+                break;
+            case BLUE:
+                text = "\uD83D\uDFE6";
+                break;
+            case GREEN:
+                text = "\uD83D\uDFE9";
+                break;
+            case BLACK:
+                text = "⬛";
+                break;
+            default:
+                text = "⬜";
+        }
     }
 
     public int getPosX() {
@@ -50,6 +73,14 @@ public class Cell {
 
     public void setType(Type type) {
         this.type = type;
+    }
+
+    public String getText() {
+        return text;
+    }
+
+    public void setText(String text) {
+        this.text = text;
     }
 
     public void addToken(Token token)
