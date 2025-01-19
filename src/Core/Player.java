@@ -44,4 +44,7 @@ public class Player {
     private boolean HasWon() {
         return tokens.stream().allMatch(token -> token.getCurrentCell().isGoal());
     }
+    public boolean hasPlayerWon() {
+        return HasWon();
+    }
 }
