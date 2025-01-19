@@ -38,6 +38,9 @@ public class Cell {
             case BLACK:
                 text = "⬛";
                 break;
+            case BROWN:
+                text = "\uD83D\uDFEB";
+                break;
             default:
                 text = "⬜";
         }
