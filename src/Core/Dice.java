@@ -18,7 +18,7 @@ public class Dice {
         this.face = face;
     }
 
-    private int rollDice() {
+    int rollDice() {
         return random.nextInt(1, 6) + 1;
     }
 }

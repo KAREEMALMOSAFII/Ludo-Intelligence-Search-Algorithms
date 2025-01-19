@@ -9,7 +9,7 @@ public class Player {
 
     private Color color;
 
-    private List<Token> tokens;
+    public List<Token> tokens;
 
     public Player(String name, Color color, List<Token> tokens) {
         this.name = name;
@@ -41,7 +41,7 @@ public class Player {
         this.tokens = tokens;
     }
 
-    private boolean HasWon() {
+    public boolean HasWon() {
         return tokens.stream().allMatch(token -> token.getCurrentCell().isGoal());
     }
 }
