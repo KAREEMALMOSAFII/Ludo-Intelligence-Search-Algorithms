@@ -47,7 +47,7 @@ public class Token {
     public void setCurrentCell(Cell currentCell) {
         this.currentCell = currentCell;
     }
-    boolean isThereTokenInBoard = ;
+    // boolean isThereTokenInBoard = ;
     // Check if the token can move based on the current dice roll
     public boolean canMove(int diceRoll, Board board) {
         System.out.println(currentCell.getType());
@@ -67,7 +67,7 @@ public class Token {
             return false;
         }
         //Rule3 and Rule4
-        Cell targetCell = board.getBoard()[targetX][targetY];
+        Cell targetCell = board.getBoard()[targetX];
         /*if (targetCell.getTokens().size() >= 2) {
             // Condition 1: If we're landing on that cell, send all tokens home
             if (targetX == currentCell.getPosX() + diceRoll) {
@@ -97,7 +97,7 @@ public class Token {
             if (this.currentCell.getType() == Type.HOME && steps == 6) {
 
                 int newX = 5, newY = 1;
-                Cell nextCell = board.getBoard()[newX][newY];
+                Cell nextCell = board.getBoard()[newX];
 
                 // Update token position
                 currentCell.removeToken(this);
@@ -115,7 +115,7 @@ public class Token {
                     if (posY == 0 && direction == Direction.LEFT) direction = Direction.TOP;
                     if (posX == board.getBoard().length - 1 && direction == Direction.BOTTOM)
                         direction = Direction.LEFT;
-                    if (posY == board.getBoard()[0].length - 1 && direction == Direction.RIGHT)
+                    if (posY == board.getBoard().length - 1 && direction == Direction.RIGHT)
                         direction = Direction.BOTTOM;
 
                     int newX = posX, newY = posY;
@@ -138,11 +138,11 @@ public class Token {
                     }
                     System.out.println(newX + newY);
                     // Ensure within bounds
-                    if (newX < 0 || newX >= board.getBoard().length || newY < 0 || newY >= board.getBoard()[0].length) {
+                    if (newX < 0 || newX >= board.getBoard().length || newY < 0 || newY >= board.getBoard().length) {
                         throw new IllegalStateException("Token moved out of bounds. Check logic.");
                     }
 
-                    Cell nextCell = board.getBoard()[newX][newY];
+                    Cell nextCell = board.getBoard()[newX];
 
                     // Handle cell logic based on type or color
                     if (!"\uD83D\uDFE5".equals(nextCell.getText())) { // Not a red cell

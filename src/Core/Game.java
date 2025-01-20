@@ -166,4 +166,25 @@ public class Game {
     {
         currentTurn = (currentTurn + 1) % players.size();
     }
+
+    int calculateNewPosition(int currentPosition, int diceRoll, int playerId) {
+        int newPosition = (currentPosition + diceRoll) % 52;
+        // If entering home path
+        if (currentPosition < board.playerStartPositions[playerId]
+                && newPosition >= board.playerStartPositions[playerId]) {
+            // Enter home path
+            return -1; // -1 indicates transitioning to home path
+        }
+        return newPosition;
+    }
+
+    void moveToHomePath(int tokenIndex, int stepsInHomePath, int playerId) {
+        board.homePaths[playerId][stepsInHomePath] = tokenIndex;
+    }
+
+//    if (newPosition == -1) {
+//        moveToHomePath(tokenIndex, 0, player.id); // Start in home path
+//    } else {
+//        player.tokens[tokenIndex] = newPosition; // Update position on the main track
+//    }
 }

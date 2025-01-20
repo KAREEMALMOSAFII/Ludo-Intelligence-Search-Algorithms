@@ -1,8 +1,9 @@
 package Core;
 
-import Utilities.Type;
 import Utilities.Color;
+import Utilities.Type;
 import java.util.*;
+
 
 public class Cell {
     private int posX;
@@ -34,6 +35,9 @@ public class Cell {
                 break;
             case BLACK:
                 text = "⬛";
+                break;
+            case BROWN:
+                text = "\uD83D\uDFEB";
                 break;
             default:
                 text = "⬜";
@@ -79,6 +83,7 @@ public class Cell {
     public void setText(String text) {
         this.text = text;
     }
+
     public void addToken(Token token)
     {
         tokens.add(token);

@@ -14,8 +14,8 @@ public class Main {
                 cells[i][j] = new Cell(i, j, Type.EMPTY,Color.WHITE);
             }
         }
-        Board board = new Board(cells);
-        board.initilizeBoard();
+        Board board = new Board();
+        board.initializeBoard();
         //board.printBoard();
 
 
