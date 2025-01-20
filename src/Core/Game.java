@@ -163,7 +163,7 @@ public class Game {
 
     // Validate the move based on game rules
     private boolean isMoveValid(Token token, Cell targetCell) {
-
+//اذا الخلبة المستهدفة امنة يمكن وضعالحجر بغض النظر عن مالك الحجر
         if (targetCell.isSafeZone()) {
             return true;
         }
