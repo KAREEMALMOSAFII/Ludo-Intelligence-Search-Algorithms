@@ -2,9 +2,7 @@ package Core;
 
 public class Token {
     private int tokenId;
-
     private Player owner;
-
     private Cell currentCell;
 
     public Token(int tokenId, Player owner, Cell currentCell) {

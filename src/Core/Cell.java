@@ -18,32 +18,41 @@ public class Cell {
 
     private String text;
 
-    public Cell(int posX, int posY, Type type , Color color) {
+    public Cell(int posX, int posY, Type type, Color color) {
         this.posX = posX;
         this.posY = posY;
         this.type = type;
-        switch (color) {
-            case RED:
-                text = "\uD83D\uDFE5";
-                break;
-            case YELLOW:
-                text = "\uD83D\uDFE8";
-                break;
-            case BLUE:
-                text = "\uD83D\uDFE6";
-                break;
-            case GREEN:
-                text = "\uD83D\uDFE9";
-                break;
-            case BLACK:
-                text = "⬛";
-                break;
-            case BROWN:
-                text = "\uD83D\uDFEB";
-                break;
-            default:
-                text = "⬜";
-        }
+        if (type.equals(Type.TOKEN) && color.equals(YELLOW))
+            text = "\uD83D\uDC66";
+        else if (type.equals(Type.TOKEN) && color.equals(RED))
+            text = "\uD83D\uDC69\uD83C\uDFFC";
+        else if (type.equals(Type.TOKEN) && color.equals(BLUE))
+            text = "\uD83D\uDC68\uD83C\uDFFF\u200D\uD83E\uDDB0";
+        else if (type.equals(Type.TOKEN) && color.equals(GREEN))
+            text = "\uD83D\uDC68\uD83C\uDFFD\u200D\uD83E\uDDB3";
+        else
+            switch (color) {
+                case RED:
+                    text = "\uD83D\uDFE5";
+                    break;
+                case YELLOW:
+                    text = "\uD83D\uDFE8";
+                    break;
+                case BLUE:
+                    text = "\uD83D\uDFE6";
+                    break;
+                case GREEN:
+                    text = "\uD83D\uDFE9";
+                    break;
+                case BLACK:
+                    text = "⬛";
+                    break;
+                case BROWN:
+                    text = "\uD83D\uDFEB";
+                    break;
+                default:
+                    text = "⬜";
+            }
     }
 
     public int getPosX() {
@@ -86,27 +95,23 @@ public class Cell {
         this.text = text;
     }
 
-    public void addToken(Token token)
-    {
+    public void addToken(Token token) {
         tokens.add(token);
     }
 
-    public void removeToken(Token token)
-    {
+    public void removeToken(Token token) {
         tokens.remove(token);
     }
-    public boolean isHome()
-    {
+
+    public boolean isHome() {
         return type.name().equals("HOME");
     }
 
-    public boolean isSafeZone()
-    {
+    public boolean isSafeZone() {
         return type.name().equals("SAFEZONE");
     }
 
-    public boolean isGoal()
-    {
+    public boolean isGoal() {
         return type.name().equals("GOAL");
     }
 

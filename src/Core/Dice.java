@@ -6,8 +6,8 @@ public class Dice {
     private int face;
     private Random random;
 
-    private Dice(int face) {
-        this.face = face;
+    public Dice() {
+        face = 0;
     }
 
     public int getFace() {
@@ -19,6 +19,9 @@ public class Dice {
     }
 
     int rollDice() {
-        return random.nextInt(1, 6) + 1;
+        int face= random.nextInt(1, 6) + 1;;
+        setFace(face);
+        return face;
+
     }
 }

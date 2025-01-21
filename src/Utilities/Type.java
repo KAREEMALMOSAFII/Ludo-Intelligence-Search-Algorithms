@@ -5,5 +5,6 @@ public enum Type {
     SAFEZONE ,
     HOME ,
     GOAL ,
-    EMPTY
+    EMPTY ,
+    TOKEN
 }

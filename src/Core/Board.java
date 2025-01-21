@@ -6,8 +6,8 @@ import Utilities.Type;
 public class Board {
 
     Cell[] board;
-    public  final  int[] playerStartPositions = {0, 13, 26, 40};
-    int[][] homePaths ;
+    public final int[] playerStartPositions = {0, 13, 26, 40};
+    Cell[][] homePaths;
 
 
     public Cell[] getBoard() {
@@ -22,7 +22,7 @@ public class Board {
     public void initializeBoard() {
 
         board = new Cell[52];
-        homePaths = new int[4][6];
+        homePaths = new Cell[4][6];
 
         for (int i = 0; i < 52; i++) {
             if (i == 0)
@@ -130,6 +130,74 @@ public class Board {
 
             else board[i] = new Cell(14, 8, Type.NORMAL, Color.WHITE);
         }
+        for (int i = 0; i < 4; i++) {
+            for (int j = 0; j < 6; j++) {
+                if (i == 0) {
+                    if (j == 0)
+                        homePaths[i][j] = new Cell(13, 8, Type.SAFEZONE, Color.BLUE);
+
+                    else if (j == 1)
+                        homePaths[i][j] = new Cell(12, 8, Type.SAFEZONE, Color.BLUE);
+
+                    else if (j == 2)
+                        homePaths[i][j] = new Cell(11, 8, Type.SAFEZONE, Color.BLUE);
+                    else if (j == 3)
+                        homePaths[i][j] = new Cell(10, 8, Type.SAFEZONE, Color.BLUE);
+                    else if (j == 4)
+                        homePaths[i][j] = new Cell(9, 8, Type.SAFEZONE, Color.BLUE);
+                    else
+                        homePaths[i][j] = new Cell(8, 7, Type.GOAL, Color.BLACK);
+                }
+                if (i == 1) {
+                    if (j == 0)
+                        homePaths[i][j] = new Cell(7, 1, Type.SAFEZONE, Color.RED);
+
+                    else if (j == 1)
+                        homePaths[i][j] = new Cell(7, 2, Type.SAFEZONE, Color.RED);
+
+                    else if (j == 2)
+                        homePaths[i][j] = new Cell(7, 3, Type.SAFEZONE, Color.RED);
+                    else if (j == 3)
+                        homePaths[i][j] = new Cell(7, 4, Type.SAFEZONE, Color.RED);
+                    else if (j == 4)
+                        homePaths[i][j] = new Cell(7, 5, Type.SAFEZONE, Color.RED);
+                    else
+                        homePaths[i][j] = new Cell(7, 6, Type.GOAL, Color.BLACK);
+                }
+                if (i == 2) {
+                    if (j == 0)
+                        homePaths[i][j] = new Cell(1, 7, Type.SAFEZONE, Color.GREEN);
+
+                    else if (j == 1)
+                        homePaths[i][j] = new Cell(2, 7, Type.SAFEZONE, Color.GREEN);
+
+                    else if (j == 2)
+                        homePaths[i][j] = new Cell(3, 7, Type.SAFEZONE, Color.GREEN);
+                    else if (j == 3)
+                        homePaths[i][j] = new Cell(4, 7, Type.SAFEZONE, Color.GREEN);
+                    else if (j == 4)
+                        homePaths[i][j] = new Cell(5, 7, Type.SAFEZONE, Color.GREEN);
+                    else
+                        homePaths[i][j] = new Cell(6, 7, Type.GOAL, Color.BLACK);
+                }
+                if (i == 3) {
+                    if (j == 0)
+                        homePaths[i][j] = new Cell(7, 13, Type.SAFEZONE, Color.YELLOW);
+
+                    else if (j == 1)
+                        homePaths[i][j] = new Cell(7, 12, Type.SAFEZONE, Color.YELLOW);
+
+                    else if (j == 2)
+                        homePaths[i][j] = new Cell(7, 11, Type.SAFEZONE, Color.YELLOW);
+                    else if (j == 3)
+                        homePaths[i][j] = new Cell(7, 10, Type.SAFEZONE, Color.YELLOW);
+                    else if (j == 4)
+                        homePaths[i][j] = new Cell(7, 9, Type.SAFEZONE, Color.YELLOW);
+                    else
+                        homePaths[i][j] = new Cell(7, 8, Type.GOAL, Color.BLACK);
+                }
+            }
+        }
     }
 
     public void printBoard() {
@@ -180,28 +248,40 @@ public class Board {
                             (i == 3 && (j == 1 || j == 4)) || (i == 4 && (j >= 1 && j <= 4))) {
                         grid[i][j] = new Cell(i, j, Type.EMPTY, Color.WHITE);
                     } else {
-                        grid[i][j] = new Cell(i, j, Type.HOME, Color.RED);
+                        if (i == 0 && j < 6 || j == 0 && i < 6 || j == 5 && i < 6 || i == 5 && j < 6)
+                            grid[i][j] = new Cell(i, j, Type.EMPTY, Color.RED);
+                        else
+                            grid[i][j] = new Cell(i, j, Type.TOKEN, Color.RED);
                     }
                 } else if (i < 6 && j > 8) { // Green Home
                     if ((i == 1 && j >= 10 && j <= 13) || (i == 2 && (j == 10 || j == 13)) ||
                             (i == 3 && (j == 10 || j == 13)) || (i == 4 && (j >= 10 && j <= 13))) {
                         grid[i][j] = new Cell(i, j, Type.EMPTY, Color.WHITE);
                     } else {
-                        grid[i][j] = new Cell(i, j, Type.HOME, Color.GREEN);
+                        if (i == 0 && j >= 9 && j < 15 || j == 14 && i < 6 || j == 9 && i < 6 || i == 5 && j >= 9 && j < 15)
+                            grid[i][j] = new Cell(i, j, Type.EMPTY, Color.GREEN);
+                        else
+                            grid[i][j] = new Cell(i, j, Type.TOKEN, Color.GREEN);
                     }
                 } else if (i > 8 && j < 6) { // Blue Home
                     if ((i == 10 && (j >= 1 && j <= 4)) || (i == 13 && (j >= 1 && j <= 4)) ||
                             (j == 4 && (i == 11 || i == 12)) || (j == 1 && (i == 11 || i == 12))) {
                         grid[i][j] = new Cell(i, j, Type.EMPTY, Color.WHITE);
                     } else {
-                        grid[i][j] = new Cell(i, j, Type.HOME, Color.BLUE);
+                        if (i == 9 && j < 6 || j == 0 && i >= 9 && i < 14 || j == 5 && i >= 9 && i < 14 || i == 14 && j < 6)
+                            grid[i][j] = new Cell(i, j, Type.EMPTY, Color.BLUE);
+                        else
+                            grid[i][j] = new Cell(i, j, Type.TOKEN, Color.BLUE);
                     }
                 } else if (i > 8 && j > 8) { // Yellow Home
                     if ((i == 10 && j >= 10 && j <= 13) || (i == 11 && (j == 10 || j == 13)) ||
                             (i == 12 && (j == 10 || j == 13)) || (i == 13 && j >= 10 && j <= 13)) {
                         grid[i][j] = new Cell(i, j, Type.EMPTY, Color.WHITE);
                     } else {
-                        grid[i][j] = new Cell(i, j, Type.HOME, Color.YELLOW);
+                        if (i == 9 && j >= 9 && j < 14 || j == 9 && i >= 9 && i < 14 || j == 14 && i >= 9 && i < 14 || i == 14 && j >= 9 && j < 15)
+                            grid[i][j] = new Cell(i, j, Type.EMPTY, Color.YELLOW);
+                        else
+                            grid[i][j] = new Cell(i, j, Type.TOKEN, Color.YELLOW);
                     }
                 }
             }
@@ -214,6 +294,15 @@ public class Board {
             }
             System.out.println();
         }
+
+        System.out.println("Home Path Array");
+        for (int i = 0; i < 4; i++) {
+            for (int j = 0; j < 6; j++) {
+                System.out.print(homePaths[i][j].getText() + " ");
+            }
+            System.out.println();
+        }
     }
+
 
 }
