@@ -15,35 +15,68 @@ public class Cell {
 
     private Type type;
     private String text;
-
+    private Color color;
+    public Cell(int posX, int posY, Type type ) {}
     public Cell(int posX, int posY, Type type , Color color) {
         this.posX = posX;
         this.posY = posY;
         this.type = type;
-        switch (color) {
-            case RED:
-                text = "\uD83D\uDFE5";
-                break;
-            case YELLOW:
-                text = "\uD83D\uDFE8";
-                break;
-            case BLUE:
-                text = "\uD83D\uDFE6";
-                break;
-            case GREEN:
-                text = "\uD83D\uDFE9";
-                break;
-            case BLACK:
-                text = "⬛";
-                break;
-            case BROWN:
-                text = "\uD83D\uDFEB";
-                break;
-            default:
-                text = "⬜";
+        if (type.equals(Type.TOKEN)){
+            switch (color) {
+                case RED:
+                    text = "🐴";
+                    break;
+                case YELLOW:
+                    text = "👴";
+                    break;
+                case BLUE:
+                    text = "👩‍🦰";
+                    break;
+                case GREEN:
+                    text = "🤴";
+                    break;
+//                case BLACK:
+//                    text = "⬛";
+//                    break;
+//                case BROWN:
+//                    text = "\uD83D\uDFEB";
+//                    break;
+                default:
+                    text = "⬜";
+            }
+        }
+
+        else {
+            switch (color) {
+                case RED:
+                    text = "\uD83D\uDFE5";
+                    break;
+                case YELLOW:
+                    text = "\uD83D\uDFE8";
+                    break;
+                case BLUE:
+                    text = "\uD83D\uDFE6";
+                    break;
+                case GREEN:
+                    text = "\uD83D\uDFE9";
+                    break;
+                case BLACK:
+                    text = "⬛";
+                    break;
+                case BROWN:
+                    text = "\uD83D\uDFEB";
+                    break;
+                default:
+                    text = "⬜";
+            }
         }
     }
-
+    public Color getColor() {
+        return color;
+    }
+    public void setColor(Color color) {
+        this.color = color;
+    }
     public int getPosX() {
         return posX;
     }

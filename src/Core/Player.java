@@ -10,13 +10,21 @@ public class Player {
     private Color color;
 
     private List<Token> tokens;
+    private int id;
 
-    public Player(String name, Color color, List<Token> tokens) {
+    public Player(String name, Color color) {
         this.name = name;
         this.color = color;
-        this.tokens = tokens;
+        this.tokens = null;
+        this.id = 0;
+    }
+    public int getId() {
+        return id;
     }
 
+    public void setId(int id) {
+        this.id = id;
+    }
     public String getName() {
         return name;
     }
@@ -41,9 +49,13 @@ public class Player {
         this.tokens = tokens;
     }
 
-    private boolean HasWon() {
-        return tokens.stream().allMatch(token -> token.getCurrentCell().isGoal());
-    }
+//    private boolean HasWon() {
+//        return tokens.stream().allMatch(token -> token.getCurrentCell().isGoal());
+//    }
+private boolean HasWon() {
+    return tokens.stream()
+            .allMatch(token -> token.getCurrentCell() != null && token.getCurrentCell().isGoal());
+}
     public boolean hasPlayerWon() {
         return HasWon();
     }

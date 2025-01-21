@@ -1,7 +1,8 @@
 package Core;
-
-import Utilities.Color;
 import Utilities.Type;
+import Utilities.Color;
+
+import java.util.List;
 
 public class Board {
 
@@ -10,16 +11,19 @@ public class Board {
     int[][] homePaths ;
 
 
-    public Board() {
-        this.board = new Cell[15];
-    }
-
     public Cell[] getBoard() {
         return board;
     }
 
     public void setBoard(Cell[] board) {
         this.board = board;
+    }
+
+    public void placeTokenAtStart(Token token, Player player) {
+        int startPos = playerStartPositions[player.getId()];
+        board[startPos].addToken(token);
+
+        token.setCurrentCell(board[startPos]);
     }
 
 
@@ -137,10 +141,10 @@ public class Board {
     }
 
     public void printBoard() {
+
         int rows = 15;
         int cols = 15;
         Cell[][] grid = new Cell[rows][cols];
-
         // Initialize the grid with default NORMAL cells
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < cols; j++) {
@@ -185,6 +189,7 @@ public class Board {
                         grid[i][j] = new Cell(i, j, Type.EMPTY, Color.WHITE);
                     } else {
                         grid[i][j] = new Cell(i, j, Type.HOME, Color.RED);
+                        grid[i][j] = new Cell(i, j, Type.TOKEN, Color.WHITE);
                     }
                 } else if (i < 6 && j > 8) { // Green Home
                     if ((i == 1 && j >= 10 && j <= 13) || (i == 2 && (j == 10 || j == 13)) ||
@@ -192,13 +197,16 @@ public class Board {
                         grid[i][j] = new Cell(i, j, Type.EMPTY, Color.WHITE);
                     } else {
                         grid[i][j] = new Cell(i, j, Type.HOME, Color.GREEN);
+                        grid[i][j] = new Cell(i, j, Type.TOKEN, Color.GREEN);
                     }
                 } else if (i > 8 && j < 6) { // Blue Home
                     if ((i == 10 && (j >= 1 && j <= 4)) || (i == 13 && (j >= 1 && j <= 4)) ||
                             (j == 4 && (i == 11 || i == 12)) || (j == 1 && (i == 11 || i == 12))) {
                         grid[i][j] = new Cell(i, j, Type.EMPTY, Color.WHITE);
+
                     } else {
                         grid[i][j] = new Cell(i, j, Type.HOME, Color.BLUE);
+                        grid[i][j] = new Cell(i, j, Type.TOKEN, Color.BLUE);
                     }
                 } else if (i > 8 && j > 8) { // Yellow Home
                     if ((i == 10 && j >= 10 && j <= 13) || (i == 11 && (j == 10 || j == 13)) ||
@@ -206,18 +214,23 @@ public class Board {
                         grid[i][j] = new Cell(i, j, Type.EMPTY, Color.WHITE);
                     } else {
                         grid[i][j] = new Cell(i, j, Type.HOME, Color.YELLOW);
+                        grid[i][j] = new Cell(i, j, Type.TOKEN, Color.YELLOW);
+
+
                     }
+
                 }
             }
         }
 
-        // Print the board
+         //Print the board
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < cols; j++) {
                 System.out.print(grid[i][j].getText() + " ");
             }
             System.out.println();
         }
+
     }
     // public void printBoard1() {
     //     for (int i = 0; i < board.length; i++) {
@@ -232,4 +245,6 @@ public class Board {
     //         System.out.println(); // Newline after each row
     //     }
     // }
+
+
 }
