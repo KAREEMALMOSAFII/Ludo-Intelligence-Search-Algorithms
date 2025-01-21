@@ -8,6 +8,7 @@ public class Dice {
 
     public Dice() {
         face = 0;
+        random = new Random();
     }
 
     public int getFace() {

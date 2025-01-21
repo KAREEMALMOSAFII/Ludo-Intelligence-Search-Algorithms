@@ -3,9 +3,9 @@ package Core;
 import Utilities.Color;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
+
 
 public class Game {
     private Board board;
@@ -13,6 +13,8 @@ public class Game {
     private int currentTurn;
     private Dice dice;
     private boolean isOver;
+
+    public final static Scanner scanner = new Scanner(System.in);
 
     public Game() {
         board= new Board();
@@ -72,105 +74,207 @@ public class Game {
 
     public void startGame() {
         board.initializeBoard();
-        Scanner scanner = new Scanner(System.in);
-        System.out.println("Choose Number Of Players , 2 Or 4 Ai Users ! ");
-        Integer numOfPlayers= scanner.nextInt();
-        System.out.println("Choose Players Number");
+        System.out.println("Choose Number Of Players: 1 (Player vs AI) or 2 (4 AI players)");
+
+        int numOfPlayers;
+        while (true) {
+            try {
+                numOfPlayers = scanner.nextInt();
+                if (numOfPlayers == 1 || numOfPlayers == 2) {
+                    break;
+                } else {
+                    System.out.println("Invalid input. Please enter 1 or 2.");
+                }
+            } catch (Exception e) {
+                System.out.println("Invalid input. Please enter a number.");
+                scanner.nextLine(); // Clear the input buffer
+            }
+        }
+
         switch (numOfPlayers) {
             case 1:
                 Player player = new Player("Player 1", Color.BLUE, new ArrayList<>());
-                Player computer = new Player("Player 2", Color.GREEN, new ArrayList<>());
-                for (int j = 0; j < 4; j++) {
-                    player.getTokens().add(new Token(j, player, null));
-                    computer.getTokens().add(new Token(j, player, null));
-                }
+                Player computer = new Player("Computer", Color.GREEN, new ArrayList<>());
+
+                initializeTokens(player);
+                initializeTokens(computer);
+
                 players.add(player);
                 players.add(computer);
                 break;
 
             case 2:
-                Player computer1 = new Player("Player 1", Color.BLUE, new ArrayList<>());
-                Player computer2 = new Player("Player 2", Color.RED, new ArrayList<>());
-                Player computer3 = new Player("Player 3", Color.GREEN, new ArrayList<>());
-                Player computer4 = new Player("Player 4", Color.YELLOW, new ArrayList<>());
-                for (int j = 0; j < 4; j++) {
-                    computer1.getTokens().add(new Token(j, computer1, null));
-                    computer2.getTokens().add(new Token(j, computer2, null));
-                    computer3.getTokens().add(new Token(j, computer3, null));
-                    computer4.getTokens().add(new Token(j, computer4, null));
-                }
+                Player computer1 = new Player("Computer 1", Color.BLUE, new ArrayList<>());
+                Player computer2 = new Player("Computer 2", Color.RED, new ArrayList<>());
+                Player computer3 = new Player("Computer 3", Color.GREEN, new ArrayList<>());
+                Player computer4 = new Player("Computer 4", Color.YELLOW, new ArrayList<>());
+
+                initializeTokens(computer1);
+                initializeTokens(computer2);
+                initializeTokens(computer3);
+                initializeTokens(computer4);
+
                 players.add(computer1);
                 players.add(computer2);
                 players.add(computer3);
                 players.add(computer4);
+                break;
         }
         while (!getIsOver()) {
-           playTurn();
+            playerMove();
+            checkWinCondition();
+            switchTurn();
+            board.printBoard();
+            for (int i = 0; i < players.size()-1; i++) {
+                computerMove();
+                checkWinCondition();
+                switchTurn();
+                board.printBoard();
+            }
         }
         System.out.println("Game Over");
     }
 
-    public void playTurn() {
+    public void playerMove()
+    {
         Player currentPlayer = players.get(currentTurn);
-        int diceRoll = dice.rollDice();
-        System.out.println(currentPlayer.getName() + "rolled a" + diceRoll);
-        actionSolo(currentPlayer, diceRoll);
-        checkWinCondition();
-        if (diceRoll != 6) { // إذا لم يحصل اللاعب على 6، يتم الانتقال للدور التالي
-            switchTurn();
-        } else {
-            System.out.println(currentPlayer.getName() + " gets another turn!");
-        }
-    }
+        int consecutiveSixes = 0;
 
-    private void actionSolo(Player currentPlayer, int diceRoll) {
-        List<int[]> throwsList = generatePossibleMoves(currentPlayer, diceRoll);
+        while (true) {
+            dice.rollDice();
+            System.out.println(currentPlayer.getName() + " rolled a " + dice.getFace());
 
-        while (!throwsList.isEmpty()) {
-            System.out.println("Throws List: " + throwsList);
-
-            if (!currentPlayer.tokens.isEmpty()) {
-                Scanner scanner = new Scanner(System.in);
-                System.out.println("Enter the ID of the stone to move (0 to " + (currentPlayer.tokens.size() - 1) + "):");
-                int stoneId = scanner.nextInt();
-                if (stoneId < 0 || stoneId >= currentPlayer.tokens.size()) {
-                    System.out.println("Invalid stone ID.");
-                    continue;
-                }
-                System.out.println("Enter the index of the throw to use (0 to " + (throwsList.size() - 1) + "):");
-                int throwIndex = scanner.nextInt();
-                if (throwIndex < 0 || throwIndex >= throwsList.size()) {
-                    System.out.println("Invalid throw index.");
-                    continue;
-                }
-
-                if (throwIndex < throwsList.size()) {
-                    int[] selectedThrow = throwsList.get(throwIndex);
-                    int tokenId = selectedThrow[0];
-                    int numberOfMoves = selectedThrow[1];
-
-                    boolean moveSuccessful = moveStone(currentPlayer, stoneId, numberOfMoves);
-                    board.printBoard();
-
-                    if (moveSuccessful) {
-                        throwsList.remove(throwIndex);
-                    } else {
-                        System.out.println("Invalid move.");
-                    }
-                } else {
-                    System.out.println("Invalid throw index.");
+            if (dice.getFace() == 6) {
+                consecutiveSixes++;
+                if (consecutiveSixes == 3) {
+                    System.out.println("You rolled three 6s in a row. Turn forfeited!");
+                    return;
                 }
             } else {
-                System.out.println("No stones available to move.");
-                break;
+                consecutiveSixes = 0; // Reset counter if not a 6
+            }
+
+            if (dice.getFace() != 6 && currentPlayer.allTokensInHome()) {
+                System.out.println("No available moves.");
+                return; // Exit if no valid moves
+            }
+
+            if (dice.getFace() == 6 && currentPlayer.allTokensInHome()) {
+
+                currentPlayer.tokens.getFirst().moveToken(board, dice.getFace());
+                return; // Exit if no valid moves
+            }
+
+            System.out.println("Choose the position of the token you want to move:");
+            int PosX = scanner.nextInt();
+            int PosY = scanner.nextInt();
+
+            if (board.getCell(PosX, PosY) != null) {
+                currentPlayer.tokens.getFirst().moveToken(board, dice.getFace());
+            } else {
+                System.out.println("Invalid position. Try again.");
+                continue; // Ask for input again if invalid position
+            }
+
+            checkWinCondition();
+
+            if (dice.getFace() != 6) {
+                break; // End the turn if dice rolled a number other than 6
             }
         }
     }
+    public void computerMove() {
+//        Player currentPlayer = players.get(currentTurn);
+//        int consecutiveSixes = 0;
+//
+//        while (true) {
+//            dice.rollDice();
+//            System.out.println("Computer rolled a " + dice.getFace());
+//
+//            if (dice.getFace() == 6) {
+//                consecutiveSixes++;
+//                if (consecutiveSixes == 3) {
+//                    System.out.println("Computer rolled three 6s in a row. Turn forfeited!");
+//                    return;
+//                }
+//            } else {
+//                consecutiveSixes = 0; // Reset counter if not a 6
+//            }
+//
+//            if (dice.getFace() != 6 && currentPlayer.allTokensInHome()) {
+//                System.out.println("No available moves for the computer.");
+//                return; // Exit if no valid moves
+//            }
+//
+//            Token bestToken = null;
+//            Cell bestMove = null;
+//            double bestScore = Double.NEGATIVE_INFINITY;
+//
+//            // Evaluate all possible moves using ExpectiMinMax algorithm
+//            for (Token token : currentPlayer.tokens) {
+//                if (token.getCurrentCell().isHome() && dice.getFace() != 6) continue; // Skip home tokens if not rolling a 6
+//
+//                Cell targetCell = board.getCell(token.getPosX() + dice.getFace(), token.getPosY());
+//                if (targetCell != null) {
+//                    double score = expectiMinMax(board, currentPlayer, 3, true);
+//                    if (score > bestScore) {
+//                        bestScore = score;
+//                        bestToken = token;
+//                        bestMove = targetCell;
+//                    }
+//                }
+//            }
+//
+//            // Make the best move
+//            if (bestToken != null && bestMove != null) {
+//                bestToken.moveToken(bestMove, dice.getFace());
+//                System.out.println("Computer moved token to position: " + bestMove.getX() + ", " + bestMove.getY());
+//            } else {
+//                System.out.println("Computer has no valid moves.");
+//                return;
+//            }
+//
+//            checkWinCondition();
+//
+//            if (dice.getFace() != 6) {
+//                break; // End the turn if dice rolled a number other than 6
+//            }
+//        }
+//    }
+//
+//    private double expectiMinMax(Board board, Player currentPlayer, int depth, boolean maximizingPlayer) {
+//        if (depth == 0 || checkWinCondition()) {
+//            return evaluateBoard(board, currentPlayer);
+//        }
+//
+//        if (maximizingPlayer) {
+//            double maxEval = Double.NEGATIVE_INFINITY;
+//            for (Token token : currentPlayer.tokens) {
+//                Cell nextMove = board.getCell(token.getPosX() + dice.getFace(), token.getPosY());
+//                if (nextMove != null) {
+//                    token.moveToken(nextMove, dice.getFace());
+//                    double eval = expectiMinMax(board, currentPlayer, depth - 1, false);
+//                    maxEval = Math.max(maxEval, eval);
+//                    token.undoMove();
+//                }
+//            }
+//            return maxEval;
+//        } else {
+//            double expectedValue = 0;
+//            for (int i = 1; i <= 6; i++) {
+//                dice.setFace(i); // Simulate all possible dice rolls
+//                expectedValue += (1.0 / 6) * expectiMinMax(board, currentPlayer, depth - 1, true);
+//            }
+//            return expectedValue;
+//        }
+//    }
+//    private double evaluateBoard(Board board, Player currentPlayer) {
+//        double score = 0;
+//        for (Token token : currentPlayer.tokens) {
+//            score += board.getCell(token.getCurrentCell().getPosX(), token.getCurrentCell().getPosY()).getScoreValue();
+//        }
+//        return score;
 
-    private boolean moveStone(Player currentPlayer, int stoneId, int numberOfMoves) {
-        // Mock stone movement
-        System.out.println("Moving stone " + stoneId + " by " + numberOfMoves + " steps.");
-        return true;
     }
 
     public void checkWinCondition() {
@@ -186,29 +290,6 @@ public class Game {
     public void switchTurn() {
         currentTurn = (currentTurn + 1) % players.size();
     }
-    // Generate possible moves based on dice roll and current state
-    private List<int[]> generatePossibleMoves(Player currentPlayer, int diceRoll) {
-        List<int[]> possibleMoves = new ArrayList<>();
-
-        for (int i = 0; i < currentPlayer.tokens.size(); i++) {
-            Token token = currentPlayer.tokens.get(i);
-
-            // اذا طلعلنا 6 منركب حجر
-            if (token.getCurrentCell() == null && diceRoll == 6) {
-                possibleMoves.add(new int[]{i, diceRoll}); // [Token ID, Dice Roll]
-            } else if (token.getCurrentCell() != null) {
-                //اذا فينا نتحرك جسب القواعد
-//                Cell targetCell = getTargetCell(token.getCurrentCell(), diceRoll);
-//
-//
-//                if (targetCell != null && isMoveValid(token, targetCell)) {
-//                    possibleMoves.add(new int[]{i, diceRoll});
-//                }
-            }
-        }
-
-        return possibleMoves;
-    }
 
     int calculateNewPosition(int currentPosition, int diceRoll, int playerId) {
         int newPosition = (currentPosition + diceRoll) % 52;
@@ -221,16 +302,13 @@ public class Game {
         return newPosition;
     }
 
-//    void moveToHomePath(int tokenIndex, int stepsInHomePath, int playerId) {
-//        board.homePaths[playerId][stepsInHomePath] = tokenIndex;
-//    }
-
-//    if (newPosition == -1) {
-//        moveToHomePath(tokenIndex, 0, player.id); // Start in home path
-//    } else {
-//        player.tokens[tokenIndex] = newPosition; // Update position on the main track
-//    }
+    private void initializeTokens(Player player) {
+        for (int j = 0; j < 4; j++) {
+            player.getTokens().add(new Token(j, player, null));
+        }
+    }
 
 }
+
 
 

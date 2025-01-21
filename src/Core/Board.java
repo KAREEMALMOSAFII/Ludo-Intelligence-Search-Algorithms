@@ -18,6 +18,12 @@ public class Board {
         this.board = board;
     }
 
+    public Cell getCell(int x , int y) {
+        for (Cell cell : board)
+            if (cell.getPosY() == x && cell.getPosY() == y )
+                return cell;
+        return null;
+    }
 
     public void initializeBoard() {
 
