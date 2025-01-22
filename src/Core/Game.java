@@ -1,10 +1,9 @@
 package Core;
 
 import Utilities.Color;
+import Utilities.Type;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 
 
 public class Game {
@@ -74,6 +73,7 @@ public class Game {
 
     public void startGame() {
         board.initializeBoard();
+        board.printBoard();
         System.out.println("Choose Number Of Players: 1 (Player vs AI) or 2 (4 AI players)");
 
         int numOfPlayers;
@@ -93,8 +93,8 @@ public class Game {
 
         switch (numOfPlayers) {
             case 1:
-                Player player = new Player("Player 1", Color.BLUE, new ArrayList<>());
-                Player computer = new Player("Computer", Color.GREEN, new ArrayList<>());
+                Player player = new Player(0,"Player 1", Color.BLUE, new ArrayList<>());
+                Player computer = new Player(2,"Computer", Color.GREEN, new ArrayList<>());
 
                 initializeTokens(player);
                 initializeTokens(computer);
@@ -104,10 +104,10 @@ public class Game {
                 break;
 
             case 2:
-                Player computer1 = new Player("Computer 1", Color.BLUE, new ArrayList<>());
-                Player computer2 = new Player("Computer 2", Color.RED, new ArrayList<>());
-                Player computer3 = new Player("Computer 3", Color.GREEN, new ArrayList<>());
-                Player computer4 = new Player("Computer 4", Color.YELLOW, new ArrayList<>());
+                Player computer1 = new Player(0,"Computer 1", Color.BLUE, new ArrayList<>());
+                Player computer2 = new Player(1,"Computer 2", Color.RED, new ArrayList<>());
+                Player computer3 = new Player(2,"Computer 3", Color.GREEN, new ArrayList<>());
+                Player computer4 = new Player(3,"Computer 4", Color.YELLOW, new ArrayList<>());
 
                 initializeTokens(computer1);
                 initializeTokens(computer2);
@@ -154,23 +154,40 @@ public class Game {
                 consecutiveSixes = 0; // Reset counter if not a 6
             }
 
+            System.out.println("currentPlayer.allTokensInHome() " + currentPlayer.allTokensInHome());
             if (dice.getFace() != 6 && currentPlayer.allTokensInHome()) {
                 System.out.println("No available moves.");
                 return; // Exit if no valid moves
             }
 
             if (dice.getFace() == 6 && currentPlayer.allTokensInHome()) {
-
-                currentPlayer.tokens.getFirst().moveToken(board, dice.getFace());
+                currentPlayer.tokens.getFirst().moveToken(dice.getFace(),board);
                 return; // Exit if no valid moves
             }
 
             System.out.println("Choose the position of the token you want to move:");
+//            currentPlayer.getTokens()
+//                    .forEach(token ->
+//                            System.out.println("The Available Token To Move: X = "
+//                                    + token.getCurrentCell().getPosX()
+//                                    + ", Y = "
+//                                    + token.getCurrentCell().getPosY()
+//                            + "TOKEN TYPE" + token.getCurrentCell().getType())
+//                    );
+
+            currentPlayer.getTokens().stream()
+                    .filter(token -> !token.getCurrentCell().isHome())
+                    .forEach(token ->
+                            System.out.println("The Available Token To Move: X = "
+                                    + token.getCurrentCell().getPosX()
+                                    + ", Y = "
+                                    + token.getCurrentCell().getPosY())
+                    );
             int PosX = scanner.nextInt();
             int PosY = scanner.nextInt();
 
-            if (board.getCell(PosX, PosY) != null) {
-                currentPlayer.tokens.getFirst().moveToken(board, dice.getFace());
+            if (board.getCellIndex(PosX, PosY) != -1) {
+                currentPlayer.tokens.getFirst().moveToken(dice.getFace(),board);
             } else {
                 System.out.println("Invalid position. Try again.");
                 continue; // Ask for input again if invalid position
@@ -294,7 +311,7 @@ public class Game {
     int calculateNewPosition(int currentPosition, int diceRoll, int playerId) {
         int newPosition = (currentPosition + diceRoll) % 52;
         // If entering home path
-        if (currentPosition < board.playerStartPositions[playerId]
+        if (currentPosition < Board.playerStartPositions[playerId]
                 && newPosition >= board.playerStartPositions[playerId]) {
             // Enter home path
             return -1; // -1 indicates transitioning to home path
@@ -303,8 +320,24 @@ public class Game {
     }
 
     private void initializeTokens(Player player) {
-        for (int j = 0; j < 4; j++) {
-            player.getTokens().add(new Token(j, player, null));
+        if (player.getColor().equals(Color.BLUE)) {
+            initializeColorTokens(player, Color.BLUE, 11, 2);
+        } else if (player.getColor().equals(Color.RED)) {
+            initializeColorTokens(player, Color.RED, 2, 2);
+        } else if (player.getColor().equals(Color.GREEN)) {
+            initializeColorTokens(player, Color.GREEN, 2, 11);
+        } else if (player.getColor().equals(Color.YELLOW)) {
+            initializeColorTokens(player, Color.YELLOW, 11, 11);
+        }
+    }
+
+    private void initializeColorTokens(Player player, Color color, int startX, int startY) {
+        for (int i = 0; i < 4; i++) {
+            int offsetX = i < 2 ? 0 : 1;  // Different offset for different rows
+            int offsetY = i % 2 == 0 ? 0 : 1;  // Alternate columns
+
+            Cell cell = new Cell(startX + offsetX, startY + offsetY, Type.HOME, color, color);
+            player.getTokens().add(new Token(i, player, cell));
         }
     }
 

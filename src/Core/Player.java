@@ -5,13 +5,16 @@ import Utilities.Color;
 import java.util.List;
 
 public class Player {
+
+    private int id;
     private String name;
 
     private Color color;
 
     public List<Token> tokens;
 
-    public Player(String name, Color color, List<Token> tokens) {
+    public Player(int id ,String name, Color color, List<Token> tokens) {
+        this.id=id;
         this.name = name;
         this.color = color;
         this.tokens = tokens;
@@ -41,11 +44,15 @@ public class Player {
         this.tokens = tokens;
     }
 
+    public int getId() {return id;}
+
+    public void setId(int id) {this.id = id;}
+
     public boolean HasWon() {
         return tokens.stream().allMatch(token -> token.getCurrentCell().isGoal());
     }
 
      boolean allTokensInHome() {
-        return getTokens().stream().allMatch(token -> token.getCurrentCell() == null);
+        return getTokens().stream().allMatch(token -> token.getCurrentCell().isHome());
     }
 }

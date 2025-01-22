@@ -3,6 +3,7 @@ package Core;
 import Utilities.Color;
 import Utilities.Type;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static Utilities.Color.*;
@@ -18,20 +19,36 @@ public class Cell {
 
     private String text;
 
-    public Cell(int posX, int posY, Type type, Color color) {
+    private Color baseColor;
+
+    public Cell(int posX, int posY, Type type, Color baseColor, Color tempColor) {
         this.posX = posX;
         this.posY = posY;
         this.type = type;
-        if (type.equals(Type.TOKEN) && color.equals(YELLOW))
-            text = "\uD83D\uDC66";
-        else if (type.equals(Type.TOKEN) && color.equals(RED))
-            text = "\uD83D\uDC69\uD83C\uDFFC";
-        else if (type.equals(Type.TOKEN) && color.equals(BLUE))
-            text = "\uD83D\uDC68\uD83C\uDFFF\u200D\uD83E\uDDB0";
-        else if (type.equals(Type.TOKEN) && color.equals(GREEN))
-            text = "\uD83D\uDC68\uD83C\uDFFD\u200D\uD83E\uDDB3";
-        else
-            switch (color) {
+        this.baseColor=baseColor;
+        this.tokens = new ArrayList<>();
+
+        Color finalColor = (tempColor != null) ? tempColor : baseColor;
+
+       if (tempColor!=null) {
+            switch (finalColor) {
+                case YELLOW:
+                    text = "\uD83D\uDC66";
+                    break;
+                case RED:
+                    text = "\uD83D\uDC69\uD83C\uDFFC";
+                    break;
+                case BLUE:
+                    text = "\uD83D\uDC68\uD83C\uDFFF\u200D\uD83E\uDDB0";
+                    break;
+                case GREEN:
+                    text = "\uD83D\uDC68\uD83C\uDFFD\u200D\uD83E\uDDB3";
+                    break;
+                default:
+                    text = "⬜";
+            }
+        } else {
+            switch (finalColor) {
                 case RED:
                     text = "\uD83D\uDFE5";
                     break;
@@ -53,8 +70,8 @@ public class Cell {
                 default:
                     text = "⬜";
             }
+        }
     }
-
     public int getPosX() {
         return posX;
     }
@@ -91,16 +108,114 @@ public class Cell {
         return text;
     }
 
-    public void setText(String text) {
-        this.text = text;
+    public Color getBaseColor() {
+        return baseColor;
     }
 
+    public void setBaseColor(Color baseColor) {
+        this.baseColor = baseColor;
+    }
+
+    public void setText( Color color) {
+        Color finalColor = (color != null) ? color : baseColor;
+
+        if (color!=null) {
+            switch (finalColor) {
+                case YELLOW:
+                    text = "\uD83D\uDC66";
+                    break;
+                case RED:
+                    text = "\uD83D\uDC69\uD83C\uDFFC";
+                    break;
+                case BLUE:
+                    text = "\uD83D\uDC68\uD83C\uDFFF\u200D\uD83E\uDDB0";
+                    break;
+                case GREEN:
+                    text = "\uD83D\uDC68\uD83C\uDFFD\u200D\uD83E\uDDB3";
+                    break;
+                default:
+                    text = "⬜";
+            }
+        } else {
+            switch (finalColor) {
+                case RED:
+                    text = "\uD83D\uDFE5";
+                    break;
+                case YELLOW:
+                    text = "\uD83D\uDFE8";
+                    break;
+                case BLUE:
+                    text = "\uD83D\uDFE6";
+                    break;
+                case GREEN:
+                    text = "\uD83D\uDFE9";
+                    break;
+                case BLACK:
+                    text = "⬛";
+                    break;
+                case BROWN:
+                    text = "\uD83D\uDFEB";
+                    break;
+                default:
+                    text = "⬜";
+            }
+        }
+    }
     public void addToken(Token token) {
+        System.out.println("Before Add TOKEN " +
+                (token.getCurrentCell() != null ? token.getCurrentCell().getType() : "null") + " " +
+                "Cell Color " + (token.getCurrentCell() != null ? token.getCurrentCell().getText() : "null") + " " +
+                "Token Owner Color " + (token.getOwner() != null ? token.getOwner().getColor() : "null") + " PosX " +
+                (token.getCurrentCell() != null ? token.getCurrentCell().getPosX() : "null") + " PosY " +
+                (token.getCurrentCell() != null ? token.getCurrentCell().getPosY() : "null") + " Cell tokens size " +
+                (token.getCurrentCell() != null && token.getCurrentCell().getTokens() != null ?
+                        token.getCurrentCell().getTokens().size() : "null") + " ");
+
         tokens.add(token);
+        this.setText(token.getOwner().getColor());
+        token.setCurrentCell(this);
+
+
+
+        System.out.println("After Add TOKEN " +
+                (token.getCurrentCell() != null ? token.getCurrentCell().getType() : "null") + " " +
+                "Cell Color " + (token.getCurrentCell() != null ? token.getCurrentCell().getText() : "null") + " " +
+                "Token Owner Color " + (token.getOwner() != null ? token.getOwner().getColor() : "null") + " PosX " +
+                (token.getCurrentCell() != null ? token.getCurrentCell().getPosX() : "null") + " PosY " +
+                (token.getCurrentCell() != null ? token.getCurrentCell().getPosY() : "null") + " Cell tokens size " +
+                (token.getCurrentCell() != null && token.getCurrentCell().getTokens() != null ?
+                        token.getCurrentCell().getTokens().size() : "null") + " ");
     }
 
     public void removeToken(Token token) {
-        tokens.remove(token);
+
+        System.out.println("Before REMOVE TOKEN " +
+                (token.getCurrentCell() != null ? token.getCurrentCell().getType() : "null") + " " +
+                "Cell Color " + (token.getCurrentCell() != null ? token.getCurrentCell().getText() : "null") + " " +
+                "Token Owner Color " + (token.getOwner() != null ? token.getOwner().getColor() : "null") + " PosX " +
+                (token.getCurrentCell() != null ? token.getCurrentCell().getPosX() : "null") + " PosY " +
+                (token.getCurrentCell() != null ? token.getCurrentCell().getPosY() : "null") + " Cell tokens size " +
+                (token.getCurrentCell() != null && token.getCurrentCell().getTokens() != null ?
+                        token.getCurrentCell().getTokens().size() : "null") + " ");
+
+        if (tokens != null) {
+            tokens.remove(token);
+            if (tokens != null && !tokens.isEmpty())
+            this.setText(tokens.getFirst().getOwner().getColor());
+            else
+                this.setText(null);
+
+        } else {
+            throw new IllegalStateException("Token list is not initialized in this cell.");
+        }
+        System.out.println("After REMOVE TOKEN " +
+                (token.getCurrentCell() != null ? token.getCurrentCell().getType() : "null") + " " +
+                "Cell Color " + (token.getCurrentCell() != null ? token.getCurrentCell().getText() : "null") + " " +
+                "Token Owner Color " + (token.getOwner() != null ? token.getOwner().getColor() : "null") + " PosX " +
+                (token.getCurrentCell() != null ? token.getCurrentCell().getPosX() : "null") + " PosY " +
+                (token.getCurrentCell() != null ? token.getCurrentCell().getPosY() : "null") + " Cell tokens size " +
+                (token.getCurrentCell() != null && token.getCurrentCell().getTokens() != null ?
+                        token.getCurrentCell().getTokens().size() : "null") + " ");
     }
 
     public boolean isHome() {
@@ -113,6 +228,10 @@ public class Cell {
 
     public boolean isGoal() {
         return type.name().equals("GOAL");
+    }
+
+    public boolean isNormal() {
+        return type.name().equals("NORMAL");
     }
 
 }
