@@ -19,7 +19,10 @@ public class Dice {
         this.face = face;
     }
 
-    void rollDice() {
-        setFace(random.nextInt(6) + 1);
+//    void rollDice() {
+//        setFace(random.nextInt(6) + 1);
+//    }
+    int rollDice() {
+        return random.nextInt(6) + 1;
     }
 }

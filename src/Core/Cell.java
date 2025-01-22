@@ -8,7 +8,7 @@ import java.util.List;
 
 import static Utilities.Color.*;
 
-public class Cell {
+public class Cell implements Cloneable{
     private int posX;
 
     private int posY;
@@ -233,5 +233,13 @@ public class Cell {
     public boolean isNormal() {
         return type.name().equals("NORMAL");
     }
-
+/*================ZAK===============*/
+@Override
+public Cell clone() {
+    try {
+        return (Cell) super.clone();
+    } catch (CloneNotSupportedException e) {
+        throw new AssertionError("Cloning not supported", e);
+    }
+}
 }

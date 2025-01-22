@@ -8,7 +8,7 @@ import java.util.Optional;
 
 import static Core.Board.playerStartPositions;
 
-public class Token {
+public class Token implements Cloneable {
     private int tokenId;
     private Player owner;
     private Cell currentCell;
@@ -47,6 +47,14 @@ public class Token {
     public void setCurrentCell(Cell currentCell) {
         this.currentCell = currentCell;
     }
+    @Override
+    public Token clone() {
+        try {
+            return (Token) super.clone();
+        } catch (CloneNotSupportedException e) {
+            throw new AssertionError("Cloning not supported", e);
+        }
+    }
 
 //    public void initializeTokensInHome(Player player) {
 //
@@ -75,7 +83,10 @@ public class Token {
          return  false;
         }
 
-
+if(owner.allTokensInHome() && diceRoll==6){
+    return true;
+}
+        System.out.println("ABOVE CAN MOVE ");
         int currentPos = getCurrentCellIndex(board);
         int targetPos = (currentPos + diceRoll) % 52;
 
@@ -98,6 +109,7 @@ public class Token {
         return true;
     }
     public void moveToken(int diceRoll, Board board) {
+        System.out.println("canMove in  moveToken ");
         if (!canMove(diceRoll, board)) {
             System.out.println("Token cannot move.");
             return;
@@ -107,9 +119,12 @@ public class Token {
             moveTokenFromHomeToStart(board);
             return;
         }
+//HERE THE PROBLEMMMMMMMMMMM
 
+        System.out.println("ABOVE  moveToken ");
         int currentPos = getCurrentCellIndex(board);
         //int targetPos = (currentPos + diceRoll);
+        //THERE IS A BUGTODO
         int targetPos = (currentPos + diceRoll) % 52;
         System.out.println("Current position: " + currentPos);
         System.out.println("Target position: " + targetPos);
@@ -158,14 +173,14 @@ public class Token {
     }
 
     private int getCurrentCellIndex(Board board) {
-        System.out.println(currentCell.getPosX() +"   " + currentCell.getPosY() );
+        System.out.println(" PosX "+currentCell.getPosX() +"  PosY " + currentCell.getPosY() );
         for (int i = 0; i < board.getBoard().length; i++) {
             if (board.getCellIndex(currentCell.getPosX(), currentCell.getPosY()) != -1) {
                 System.out.println("FOUNED  " + board.getCellIndex(currentCell.getPosX(), currentCell.getPosY()) );
                 return board.getCellIndex(currentCell.getPosX(), currentCell.getPosY());
             }
         }
-        System.out.println("NOTTFOUNED  ");
+        System.out.println("NOT TFOUNED  ");
         return -1; // Not found
     }
 
@@ -207,5 +222,19 @@ public class Token {
         }
     }
 
-
+/*ZAK*/
+public int getPosition() {
+    if (currentCell != null) {
+        // Convert 2D position (posX, posY) to a single position if needed.
+        // For example, assume the board has a fixed width (e.g., 10):
+        int boardWidth = 15; // Adjust this based on your board dimensions
+        return currentCell.getPosY() * boardWidth + currentCell.getPosX();
+    }
+    return -1; // Default if token is not on any cell
+}
+    // Method to return progress as distance covered from the start
+    public int getProgress() {
+    int startPosition =playerStartPositions[owner.getId()];
+        return getPosition() - startPosition;
+    }
 }
