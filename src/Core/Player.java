@@ -2,9 +2,8 @@ package Core;
 
 import Utilities.Color;
 
-import java.util.List;
-
-public class Player {
+import java.util.*;
+public class Player{
 
     private int id;
     private String name;
@@ -55,4 +54,5 @@ public class Player {
      boolean allTokensInHome() {
         return getTokens().stream().allMatch(token -> token.getCurrentCell().isHome());
     }
+
 }

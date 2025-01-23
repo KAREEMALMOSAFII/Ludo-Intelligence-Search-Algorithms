@@ -8,7 +8,7 @@ import java.util.List;
 
 import static Utilities.Color.*;
 
-public class Cell {
+public class Cell{
     private int posX;
 
     private int posY;

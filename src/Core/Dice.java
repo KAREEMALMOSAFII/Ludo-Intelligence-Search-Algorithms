@@ -35,4 +35,5 @@ public class Dice {
 //        setFace(random.nextInt(6) + 1);
 //
 //    }
+
 }

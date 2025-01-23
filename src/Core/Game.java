@@ -22,7 +22,6 @@ public class Game {
         dice = new Dice();
         isOver = false;
     }
-
     public Game(Board board, List<Player> players, int currentTurn, Dice dice, boolean isOver) {
         this.board = board;
         this.players = players;
@@ -135,6 +134,14 @@ public class Game {
                 switchTurn();
                 board.printBoard();
             }
+        }
+        case 2 :
+        for (int i = 0; i < players.size(); i++) {
+            // computerMove();
+            playComputerMove();
+            checkWinCondition();
+            switchTurn();
+            board.printBoard();
         }
         System.out.println("Game Over");
     }
@@ -361,6 +368,239 @@ public class Game {
         }
     }
 
+
+
+// ================================================================================= ALGORITHIM ===================================================================================
+private void playComputerMove() {
+    int bestScore = Integer.MIN_VALUE;
+    int bestRow = -1;
+    int bestCol = -1;
+    Player currentPlayer = players.get(currentTurn);
+
+    dice.rollDice();
+    System.out.println(currentPlayer.getName() + " rolled a " + dice.getFace());
+
+    for (Token token : currentPlayer.getTokens()) {
+
+        if (token.canMove(dice.getFace(),board)) {
+            System.out.println("can move======================");
+
+if(currentPlayer.allTokensInHome() && dice.getFace()==6){
+//    board.getBoard()[].addToken(token);
+    token.moveTokenFromHomeToStart(board);
+}
+else{
+    int position = board.getCellIndex(token.getCurrentCell().getPosX(), token.getCurrentCell().getPosY());
+    //if this position cell didn't in the 1th array
+if(position == -1){
+    continue;
+}
+else {
+    board.getBoard()[position].addToken(token);
+}
+
+}
+
+            token.moveToken(dice.getFace(),board);
+
+            System.out.println("FROM COMPUTER MOVE");
+            board.printBoard();
+            int score = expectiminimax1(0, false,token);
+            int position = board.getCellIndex(token.getCurrentCell().getPosX(), token.getCurrentCell().getPosY());
+            board.getBoard()[position].removeToken(token);
+            if (score > bestScore) {
+                System.out.println("bestRow " + bestRow + " bestCol " + bestCol);
+
+                System.out.println("SCORE Updated , Last Score " + bestScore + " new score " + score);
+
+                bestScore = score;
+                bestRow = token.getCurrentCell().getPosX();
+                bestCol = token.getCurrentCell().getPosY();
+            }
+
+            board.getBoard()[position].addToken(token);
+        }
+
+
+    }
+
+
+
+    System.out.println("Block Setted At Potition  " + bestRow + " " + bestCol + " With Score : " + bestScore);
+
+}
+
+    private int expectiminimax1(int depth, boolean maximizingPlayer, Token token) {
+        Player currentPlayer = players.get(currentTurn);
+        if (isOver || depth == 2) {
+            return evaluate(token);
+        }
+
+        if (maximizingPlayer) {
+            int maxEval = Integer.MIN_VALUE;
+                if (token.canMove(dice.getFace(),board)) {
+                    if(currentPlayer.allTokensInHome() && dice.getFace()==6){
+//    board.getBoard()[].addToken(token);
+                        token.moveTokenFromHomeToStart(board);
+                    }
+                    else {
+                        // Only proceed if the token is not out of bounds
+                        int position = board.getCellIndex(token.getCurrentCell().getPosX(), token.getCurrentCell().getPosY());
+                        if (position >= 0 && position < board.getBoard().length) {
+                            board.getBoard()[position].addToken(token);
+                        } else {
+                            System.out.println("Invalid position: " + position);
+                            return Integer.MIN_VALUE; // Handle invalid position if needed
+                        }
+                    }
+
+                    //token.moveToken(dice.getFace(),board);
+
+                    System.out.println("FROM MAX");
+                    int position = board.getCellIndex(token.getCurrentCell().getPosX(), token.getCurrentCell().getPosY());
+                    board.printBoard();
+                    int eval = expectiminimax1(depth + 1, false,token);
+                    board.getBoard()[position].removeToken(token);
+                    maxEval = Math.max(maxEval, eval);
+
+                }
+
+
+            return maxEval;
+
+        } else {
+            int minEval = Integer.MAX_VALUE;
+
+                if (token.canMove(dice.getFace(),board)) {
+                    int position = board.getCellIndex(token.getCurrentCell().getPosX(), token.getCurrentCell().getPosY());
+                    System.out.println("ttttttt"+position);
+
+                    if(currentPlayer.allTokensInHome() && dice.getFace()==6){
+//    board.getBoard()[].addToken(token);
+                        token.moveTokenFromHomeToStart(board);
+                    }
+                    else {
+                        // Only proceed if the token is not out of bounds
+
+                        if (position >= 0 && position < board.getBoard().length) {
+                            board.getBoard()[position].addToken(token);
+                        } else {
+                            System.out.println("Invalid position: " + position);
+                            return Integer.MIN_VALUE; // Handle invalid position if needed
+                        }
+                    }
+                    token.moveToken(dice.getFace(),board);
+
+
+                    System.out.println("FROM MIN");
+                    board.printBoard();
+                    int eval = expectiminimax1(depth + 1, true,token);
+
+                    board.getBoard()[position].removeToken(token);
+                    minEval = Math.min(minEval, eval);
+
+                }
+
+
+            return minEval;
+        }
+
+    }
+    private int evaluate(Token token) {
+        int score = 0;
+
+        Player owner = token.getOwner();
+
+        Cell currentCell = token.getCurrentCell();
+
+        if (currentCell.isGoal()) {
+
+            score += 100;
+        } else if (currentCell.isHome()) {
+            score += 50;
+        } else {
+
+            score += getScore(currentCell.getPosX(), currentCell.getPosY());
+        }
+
+        // Penalize if the opponent's token is nearby or on the same cell
+        for (Player opponent : players) {
+            if (opponent != owner) {
+                for (Token opponentToken : opponent.getTokens()) {
+                    int position1 = board.getCellIndex(opponentToken.getCurrentCell().getPosX(), opponentToken.getCurrentCell().getPosY());
+                    int position2 = board.getCellIndex(token.getCurrentCell().getPosX(), token.getCurrentCell().getPosY());
+                    if (position1 == position2) {
+                        score -= 30;
+                    }
+                }
+            }
+        }
+
+        if (!currentCell.getType().equals(Type.SAFEZONE)) {
+            score -= 20;  // Penalize unsafe position
+        }
+
+        return score;
+    }
+
+    // A method that evaluates a position on the Ludo board and assigns a score
+    private int getScore(int row, int col) {
+        int score = 0;
+        // check if the current position is near the goal (higher score for tokens closer to the goal)
+        score += evaluateProximityToGoal(row, col);
+        // check if the position is safe (some positions on the board are safe zones)
+        score += evaluateSafety(row, col);
+        // penalize if an opponent is near or can capture the token
+        score += evaluateOpponentProximity(row, col);
+
+        return score;
+    }
+    // evaluates the proximity to the goal area (higher score for tokens near the goal)
+    private int evaluateProximityToGoal(int row, int col) {
+        int score = 0;
+        int goalRow = 0; // Example goal row
+        int goalCol = board.getBoard().length - 1;
+
+
+        int distanceToGoal = Math.abs(goalRow - row) + Math.abs(goalCol - col);
+
+        // Closer to goal, higher score
+        if (distanceToGoal == 0) {
+            score += 100;
+        } else {
+            score += (board.getBoard().length - 1 - distanceToGoal);
+        }
+
+        return score;
+    }
+
+    // evaluates if the token is in a safe position (safe zones are predefined)
+    private int evaluateSafety(int row, int col) {
+        int score = 0;
+        if (board.getBoard()[board.getCellIndex(row,col)].isSafeZone()) {
+            score += 50;
+        }
+
+        return score;
+    }
+
+
+    // check all positions within a range
+    private int evaluateOpponentProximity(int row, int col) {
+        int score = 0;
+        int currentCellIndex = board.getCellIndex(row, col);
+        int boardLength = board.getBoard().length;
+
+
+        for (int i = currentCellIndex - 6; i <= currentCellIndex + 6; i++) {
+            if (i >= 0 && i < boardLength) {
+                if (!board.getBoard()[i].getTokens().isEmpty()) {
+                    score -= 30;
+                }
+            }
+        }
+        return score;
+    }
 }
 
 

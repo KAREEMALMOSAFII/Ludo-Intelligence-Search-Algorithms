@@ -49,33 +49,16 @@ public class Token {
         this.currentCell = currentCell;
     }
 
-//    public void initializeTokensInHome(Player player) {
-//
-//        List<Token> tokens = player.getTokens();
-//        Color playerColor = player.getColor();
-//        int tokenIndex = 0;
-//
-//        for (int i = 0; i < rows; i++) {
-//            for (int j = 0; j < cols; j++) {
-//                // Assign tokens to the first four `HOME` cells of the player's color
-//                if (grid[i][j].getType() == Type.HOME && grid[i][j].getColor() == playerColor) {
-//                    if (tokenIndex < tokens.size()) {
-//                        Token token = tokens.get(tokenIndex);
-//                        token.setCurrentCell(grid[i][j]);
-//                        grid[i][j].addToken(token);
-//                        tokenIndex++;
-//                    }
-//                }
-//            }
-//        }
-//    }
+    public boolean canMove(int diceRoll, Board board) {
+        if (owner.allTokensInHome() && diceRoll != 6) {
+         return  false;
+        }
 
-
-    public boolean canMove(int diceRoll, Board board,int pos) {
-//        if (owner.allTokensInHome() && diceRoll != 6) {
-//            return false;
-//        }
-
+if(owner.allTokensInHome() && diceRoll==6){
+    return true;
+}
+        System.out.println("ABOVE CAN MOVE ");
+        int currentPos = getCurrentCellIndex(board);
 
        int currentPos = pos;
         int targetPos = (currentPos + diceRoll) % 52;
@@ -100,6 +83,10 @@ public class Token {
         if (isHome) {
             System.out.println("START LOGIC: Moving token from home to start.");
             moveTokenFromHomeToStart(board);
+            return;
+        }
+        if (!canMove(diceRoll, board)) {
+            System.out.println("Token cannot move.");
             return;
         }
 
@@ -139,6 +126,11 @@ public class Token {
 
 
         // Calculate target position on the board (handling circular movement)
+
+        System.out.println("ABOVE  moveToken ");
+        int currentPos = getCurrentCellIndex(board);
+        //int targetPos = (currentPos + diceRoll);
+        //THERE IS A BUGTODO
         int targetPos = (currentPos + diceRoll) % 52;
 
         System.out.println("Current position: " + currentPos);
@@ -160,7 +152,7 @@ public class Token {
                 return board.getCellIndex(currentCell.getPosX(), currentCell.getPosY());
             }
         }
-        System.out.println("NOTTFOUNED  ");
+        System.out.println("NOT TFOUNED  ");
         return -1; // Not found
     }
 

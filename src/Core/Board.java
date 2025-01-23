@@ -2,13 +2,11 @@ package Core;
 
 import Utilities.Color;
 import Utilities.Type;
-
 public class Board {
 
     Cell[] board;
     public static final int[] playerStartPositions = {0, 13, 26, 40};
     public static  Cell[][] homePaths;
-
 
     public Cell[] getBoard() {
         return board;
@@ -23,7 +21,9 @@ public class Board {
             if (board[i].getPosX() == x && board[i].getPosY() == y)
                 return i;
         }
+        System.out.println("No cell found for position x=" + x + ", y=" + y);
         return -1;
+
     }
 
     public void initializeBoard() {
@@ -313,6 +313,5 @@ public class Board {
             System.out.println();
         }
     }
-
 
 }
