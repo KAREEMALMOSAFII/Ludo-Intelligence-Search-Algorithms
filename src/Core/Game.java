@@ -122,7 +122,7 @@ public class Game {
         if(numOfPlayers==1)
         {
         while (!getIsOver()) {
-            System.out.println("Player Turn");
+//            System.out.println("Player Turn");
             playerMove();
             checkWinCondition();
             switchTurn();
@@ -130,6 +130,7 @@ public class Game {
 
             for (int i = 0; i < players.size() - 1; i++) {
                 System.out.println("Computer Turn");
+                playComputerMove();
                 playerMove();
                 //  computerMove();
                 checkWinCondition();
@@ -139,13 +140,16 @@ public class Game {
         }
         }
         else {
-            for (int i = 0; i < players.size(); i++) {
-                // computerMove();
-                playComputerMove();
-                checkWinCondition();
-                switchTurn();
-                board.printBoard();
+            while (!getIsOver()) {
+                for (int i = 0; i < players.size(); i++) {
+                    // computerMove();
+                    playComputerMove();
+                    checkWinCondition();
+                    switchTurn();
+                    board.printBoard();
+                }
             }
+
         }
 
 
@@ -388,7 +392,7 @@ private void playComputerMove() {
 
     for (Token token : currentPlayer.getTokens()) {
 
-        if (token.canMove(dice.getFace(),board,)) {
+        if (token.canMove(dice.getFace(),board,token.getCurrentCellIndex(board))) {
             System.out.println("can move======================");
 
 if(currentPlayer.allTokensInHome() && dice.getFace()==6){
@@ -399,7 +403,7 @@ else{
     int position = board.getCellIndex(token.getCurrentCell().getPosX(), token.getCurrentCell().getPosY());
     //if this position cell didn't in the 1th array
 if(position == -1){
-    continue;
+    break;
 }
 else {
     board.getBoard()[position].addToken(token);
@@ -413,7 +417,22 @@ else {
             board.printBoard();
             int score = expectiminimax1(0, false,token);
             int position = board.getCellIndex(token.getCurrentCell().getPosX(), token.getCurrentCell().getPosY());
-            board.getBoard()[position].removeToken(token);
+            if(position == -1){
+                if(currentPlayer.HasWon()){
+                    System.out.println("WOOOOOOOOOOOOON");
+                    break;
+                }
+                else{
+                    continue;
+                }
+
+            }
+            else {
+                board.getBoard()[position].removeToken(token);
+            }
+
+
+
             if (score > bestScore) {
                 System.out.println("bestRow " + bestRow + " bestCol " + bestCol);
 
@@ -444,7 +463,7 @@ else {
 
         if (maximizingPlayer) {
             int maxEval = Integer.MIN_VALUE;
-                if (token.canMove(dice.getFace(),board,)) {
+                if (token.canMove(dice.getFace(),board,token.getCurrentCellIndex(board))) {
                     if(currentPlayer.allTokensInHome() && dice.getFace()==6){
 //    board.getBoard()[].addToken(token);
                         token.moveTokenFromHomeToStart(board);

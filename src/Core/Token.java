@@ -45,7 +45,13 @@ public class Token {
     }
 
     public boolean canMove(int diceRoll, Board board, int pos) {
+        if (owner.allTokensInHome() && diceRoll != 6) {
+            return  false;
+        }
 
+        if(owner.allTokensInHome() && diceRoll==6){
+            return true;
+        }
         int currentPos = pos;
         int targetPos = (currentPos + diceRoll) % 52;
 
@@ -64,13 +70,22 @@ public class Token {
     }
 
     public void moveToken(int diceRoll, Board board, Integer posX, Integer posY, boolean isHome) {
-        int currentPos = board.getCellIndex(posX, posY);
+        int currentPos = getCurrentCellIndex(board);
+//        int currentPos = board.getCellIndex(posX, posY);
+
         // Move token from home if all tokens are in home and dice roll is 6
         if (isHome) {
             System.out.println("START LOGIC: Moving token from home to start.");
             moveTokenFromHomeToStart(board);
             return;
         }
+        /*******************************************************/
+        if (owner.allTokensInHome() && diceRoll == 6) {
+            System.out.println("STARTLOGIC");
+            moveTokenFromHomeToStart(board);
+            return;
+        }
+
         if (!canMove(diceRoll, board, currentPos)) {
             System.out.println("Token cannot move.");
             return;
@@ -120,10 +135,10 @@ public class Token {
         board.getBoard()[targetPos].addToken(this);
         currentCell = board.getBoard()[targetPos];
 
-        // board.printBoard();
+        board.printBoard();
     }
 
-    private int getCurrentCellIndex(Board board) {
+    public int getCurrentCellIndex(Board board) {
         System.out.println(currentCell.getPosX() + "   " + currentCell.getPosY());
         for (int i = 0; i < board.getBoard().length; i++) {
             if (board.getCellIndex(currentCell.getPosX(), currentCell.getPosY()) != -1) {
