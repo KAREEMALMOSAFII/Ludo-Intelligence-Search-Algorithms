@@ -171,9 +171,11 @@ public class Cell {
                 (token.getCurrentCell() != null && token.getCurrentCell().getTokens() != null ?
                         token.getCurrentCell().getTokens().size() : "null") + " ");
 
+
         tokens.add(token);
         this.setText(token.getOwner().getColor());
         token.setCurrentCell(this);
+        this.tokens.removeIf(t -> !t.getOwner().equals(token.getOwner()));
 
 
 

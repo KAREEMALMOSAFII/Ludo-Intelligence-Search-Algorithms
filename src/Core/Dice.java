@@ -19,7 +19,20 @@ public class Dice {
         this.face = face;
     }
 
+    private final int[] testRolls = {6, 6, 3, 6, 6};  // Sample test sequence
+    private int rollIndex = 0;
     void rollDice() {
-        setFace(random.nextInt(6) + 1);
+
+        if (rollIndex < testRolls.length) {
+            setFace(testRolls[rollIndex]);
+            rollIndex++;
+        } else {
+            Random random = new Random();
+            setFace(random.nextInt(6) + 1);  // Roll a random number between 1 and 6
+        }
     }
+//    void rollDice() {
+//        setFace(random.nextInt(6) + 1);
+//
+//    }
 }

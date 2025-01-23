@@ -7,7 +7,7 @@ public class Board {
 
     Cell[] board;
     public static final int[] playerStartPositions = {0, 13, 26, 40};
-    Cell[][] homePaths;
+    public static  Cell[][] homePaths;
 
 
     public Cell[] getBoard() {
@@ -132,8 +132,10 @@ public class Board {
                 board[i] = new Cell(13, 8, Type.NORMAL, Color.WHITE, null);
             else if (i == 49)
                 board[i] = new Cell(14, 8, Type.NORMAL, Color.WHITE, null);
-
-            else board[i] = new Cell(14, 8, Type.NORMAL, Color.WHITE, null);
+            else if (i == 50)
+             board[i] = new Cell(14, 7, Type.NORMAL, Color.WHITE, null);
+            else
+                board[i] = new Cell(14, 6, Type.NORMAL, Color.WHITE, null);
         }
         for (int i = 0; i < 4; i++) {
             for (int j = 0; j < 6; j++) {
@@ -209,7 +211,7 @@ public class Board {
         int rows = 15;
         int cols = 15;
         Cell[][] grid = new Cell[rows][cols];
-
+        Cell[][] homPathGrid = new Cell[4][6];
         // Initialize the grid with default NORMAL cells
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < cols; j++) {
@@ -224,6 +226,7 @@ public class Board {
             int y = board[i].getPosY();
             grid[x][y] = board[i];
         }
+
         System.out.println(" ");
         System.out.println(" ");
         // Add additional zones (safe zones, home areas, goals)

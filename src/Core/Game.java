@@ -16,9 +16,9 @@ public class Game {
     public final static Scanner scanner = new Scanner(System.in);
 
     public Game() {
-        board= new Board();
-        players= new ArrayList<>();
-        currentTurn=0;
+        board = new Board();
+        players = new ArrayList<>();
+        currentTurn = 0;
         dice = new Dice();
         isOver = false;
     }
@@ -93,8 +93,8 @@ public class Game {
 
         switch (numOfPlayers) {
             case 1:
-                Player player = new Player(0,"Player 1", Color.BLUE, new ArrayList<>());
-                Player computer = new Player(2,"Computer", Color.GREEN, new ArrayList<>());
+                Player player = new Player(0, "Player 1", Color.BLUE, new ArrayList<>());
+                Player computer = new Player(1, "Computer", Color.RED, new ArrayList<>());
 
                 initializeTokens(player);
                 initializeTokens(computer);
@@ -104,10 +104,10 @@ public class Game {
                 break;
 
             case 2:
-                Player computer1 = new Player(0,"Computer 1", Color.BLUE, new ArrayList<>());
-                Player computer2 = new Player(1,"Computer 2", Color.RED, new ArrayList<>());
-                Player computer3 = new Player(2,"Computer 3", Color.GREEN, new ArrayList<>());
-                Player computer4 = new Player(3,"Computer 4", Color.YELLOW, new ArrayList<>());
+                Player computer1 = new Player(0, "Computer 1", Color.BLUE, new ArrayList<>());
+                Player computer2 = new Player(1, "Computer 2", Color.RED, new ArrayList<>());
+                Player computer3 = new Player(2, "Computer 3", Color.GREEN, new ArrayList<>());
+                Player computer4 = new Player(3, "Computer 4", Color.YELLOW, new ArrayList<>());
 
                 initializeTokens(computer1);
                 initializeTokens(computer2);
@@ -121,11 +121,14 @@ public class Game {
                 break;
         }
         while (!getIsOver()) {
+            System.out.println("Player Turn");
             playerMove();
             checkWinCondition();
             switchTurn();
             board.printBoard();
-            for (int i = 0; i < players.size()-1; i++) {
+
+            for (int i = 0; i < players.size() -1 ; i++) {
+                System.out.println("Computer Turn");
                 computerMove();
                 checkWinCondition();
                 switchTurn();
@@ -135,71 +138,65 @@ public class Game {
         System.out.println("Game Over");
     }
 
-    public void playerMove()
-    {
+    public void playerMove() {
         Player currentPlayer = players.get(currentTurn);
         int consecutiveSixes = 0;
 
-        while (true) {
-            dice.rollDice();
-            System.out.println(currentPlayer.getName() + " rolled a " + dice.getFace());
+        dice.rollDice();
+        int rolledValue = dice.getFace();
+        System.out.println(currentPlayer.getName() + " rolled a " + rolledValue);
 
-            if (dice.getFace() == 6) {
-                consecutiveSixes++;
-                if (consecutiveSixes == 3) {
-                    System.out.println("You rolled three 6s in a row. Turn forfeited!");
-                    return;
-                }
-            } else {
-                consecutiveSixes = 0; // Reset counter if not a 6
-            }
-
-            System.out.println("currentPlayer.allTokensInHome() " + currentPlayer.allTokensInHome());
-            if (dice.getFace() != 6 && currentPlayer.allTokensInHome()) {
-                System.out.println("No available moves.");
-                return; // Exit if no valid moves
-            }
-
-            if (dice.getFace() == 6 && currentPlayer.allTokensInHome()) {
-                currentPlayer.tokens.getFirst().moveToken(dice.getFace(),board);
-                return; // Exit if no valid moves
-            }
-
-            System.out.println("Choose the position of the token you want to move:");
-//            currentPlayer.getTokens()
-//                    .forEach(token ->
-//                            System.out.println("The Available Token To Move: X = "
-//                                    + token.getCurrentCell().getPosX()
-//                                    + ", Y = "
-//                                    + token.getCurrentCell().getPosY()
-//                            + "TOKEN TYPE" + token.getCurrentCell().getType())
-//                    );
-
-            currentPlayer.getTokens().stream()
-                    .filter(token -> !token.getCurrentCell().isHome())
-                    .forEach(token ->
-                            System.out.println("The Available Token To Move: X = "
-                                    + token.getCurrentCell().getPosX()
-                                    + ", Y = "
-                                    + token.getCurrentCell().getPosY())
-                    );
-            int PosX = scanner.nextInt();
-            int PosY = scanner.nextInt();
-
-            if (board.getCellIndex(PosX, PosY) != -1) {
-                currentPlayer.tokens.getFirst().moveToken(dice.getFace(),board);
-            } else {
-                System.out.println("Invalid position. Try again.");
-                continue; // Ask for input again if invalid position
-            }
-
-            checkWinCondition();
-
-            if (dice.getFace() != 6) {
-                break; // End the turn if dice rolled a number other than 6
-            }
+        if (rolledValue != 6 && currentPlayer.allTokensInHome()) {
+            System.out.println("No available moves.");
+            return;
         }
+
+        if (rolledValue == 6 && currentPlayer.allTokensInHome()) {
+            currentPlayer.getTokens().stream()
+                    .filter(token -> token.getCurrentCell().isHome())
+                    .forEach(token ->
+                            System.out.println("The Available Token To Move From Home: X = " + token.getCurrentCell().getPosX()
+                                    + ", Y = " + token.getCurrentCell().getPosY())
+                    );
+            int posX = scanner.nextInt();
+            int posY = scanner.nextInt();
+            currentPlayer.tokens.stream()
+                    .filter(token -> token.getCurrentCell().getPosX() == posX && token.getCurrentCell().getPosY() == posY)
+                    .findFirst().ifPresent(token -> token.moveToken(rolledValue, board, posX, posY, true));
+           // board.printBoard();
+            return;
+        }
+
+        if (rolledValue == 6 && !currentPlayer.allTokensInHome() && currentPlayer.tokens.stream().anyMatch(s -> s.getCurrentCell().isHome())) {
+            System.out.println("Press 0 to move token from home to start or 1 to move one of the tokens on the board");
+            int choice = scanner.nextInt();
+            if (choice == 0) {
+                currentPlayer.tokens.stream().filter(s -> s.getCurrentCell().isHome()).findFirst()
+                        .ifPresent(token -> token.moveToken(rolledValue, board, null, null, true));
+           //     board.printBoard();
+            } else {
+                currentPlayer.getTokens().stream()
+                        .filter(token -> !token.getCurrentCell().isGoal() && !token.getCurrentCell().isHome())
+                        .forEach(token ->
+                                System.out.println("Available Token To Move From Board: X = " + token.getCurrentCell().getPosX()
+                                        + ", Y = " + token.getCurrentCell().getPosY())
+                        );
+                int posX = scanner.nextInt();
+                int posY = scanner.nextInt();
+                currentPlayer.tokens.stream()
+                        .filter(token -> token.getCurrentCell().getPosX() == posX && token.getCurrentCell().getPosY() == posY)
+                        .findFirst().ifPresent(token -> token.moveToken(rolledValue, board, posX, posY, false));
+             //   board.printBoard();
+            }
+            return;
+        }
+
+        checkWinCondition();
+        System.out.println("Finish Player Move");
     }
+
+
+
     public void computerMove() {
 //        Player currentPlayer = players.get(currentTurn);
 //        int consecutiveSixes = 0;
