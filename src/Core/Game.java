@@ -93,8 +93,8 @@ public class Game {
 
         switch (numOfPlayers) {
             case 1:
-                Player player = new Player(0, "Player 1", Color.BLUE, new ArrayList<>());
-                Player computer = new Player(1, "Computer", Color.RED, new ArrayList<>());
+                Player player = new Player(0, "Player ", Color.BLUE, new ArrayList<>());
+                Player computer = new Player(1, "Computer ", Color.RED, new ArrayList<>());
 
                 initializeTokens(player);
                 initializeTokens(computer);
@@ -129,7 +129,8 @@ public class Game {
 
             for (int i = 0; i < players.size() -1 ; i++) {
                 System.out.println("Computer Turn");
-                computerMove();
+                playerMove();
+              //  computerMove();
                 checkWinCondition();
                 switchTurn();
                 board.printBoard();
@@ -151,7 +152,7 @@ public class Game {
             return;
         }
 
-        if (rolledValue == 6 && currentPlayer.allTokensInHome()) {
+       else if (rolledValue == 6 && currentPlayer.allTokensInHome()) {
             currentPlayer.getTokens().stream()
                     .filter(token -> token.getCurrentCell().isHome())
                     .forEach(token ->
@@ -167,8 +168,16 @@ public class Game {
             return;
         }
 
-        if (rolledValue == 6 && !currentPlayer.allTokensInHome() && currentPlayer.tokens.stream().anyMatch(s -> s.getCurrentCell().isHome())) {
-            System.out.println("Press 0 to move token from home to start or 1 to move one of the tokens on the board");
+      else if (rolledValue == 6 && !currentPlayer.allTokensInHome() && currentPlayer.tokens.stream().anyMatch(s -> s.getCurrentCell().isHome())) {
+            System.out.println("Press 0 to move token from home to start or 1 to move on Of : ");
+
+            currentPlayer.getTokens().stream()
+                    .filter(token -> token.getCurrentCell().isNormal() || token.getCurrentCell().isSafeZone())
+                    .forEach(token ->
+                            System.out.println(" X = " + token.getCurrentCell().getPosX()
+                                    + ", Y = " + token.getCurrentCell().getPosY())
+                    );
+
             int choice = scanner.nextInt();
             if (choice == 0) {
                 currentPlayer.tokens.stream().filter(s -> s.getCurrentCell().isHome()).findFirst()
@@ -176,7 +185,7 @@ public class Game {
            //     board.printBoard();
             } else {
                 currentPlayer.getTokens().stream()
-                        .filter(token -> !token.getCurrentCell().isGoal() && !token.getCurrentCell().isHome())
+                        .filter(token -> token.getCurrentCell().isNormal() ||  token.getCurrentCell().isSafeZone())
                         .forEach(token ->
                                 System.out.println("Available Token To Move From Board: X = " + token.getCurrentCell().getPosX()
                                         + ", Y = " + token.getCurrentCell().getPosY())
@@ -188,10 +197,24 @@ public class Game {
                         .findFirst().ifPresent(token -> token.moveToken(rolledValue, board, posX, posY, false));
              //   board.printBoard();
             }
-            return;
+
+        }
+      else
+        {
+            currentPlayer.getTokens().stream()
+                    .filter(token -> token.getCurrentCell().isNormal() || token.getCurrentCell().isSafeZone())
+                    .forEach(token ->
+                            System.out.println("Available Token To Move From Board: X = " + token.getCurrentCell().getPosX()
+                                    + ", Y = " + token.getCurrentCell().getPosY())
+                    );
+            int posX = scanner.nextInt();
+            int posY = scanner.nextInt();
+            currentPlayer.tokens.stream()
+                    .filter(token -> token.getCurrentCell().getPosX() == posX && token.getCurrentCell().getPosY() == posY)
+                    .findFirst().ifPresent(token -> token.moveToken(rolledValue, board, posX, posY, false));
         }
 
-        checkWinCondition();
+
         System.out.println("Finish Player Move");
     }
 

@@ -175,7 +175,6 @@ public class Token {
     }
 
     public void moveTokenFromHomeToStart(Board board) {
-        System.out.println("moveTokenFromHomeToStart");
         Optional<Token> homeToken = owner.getTokens().stream()
                 .filter(token -> token.getCurrentCell().isHome())
                 .findFirst();
