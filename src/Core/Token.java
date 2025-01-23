@@ -1,14 +1,9 @@
 package Core;
-import Utilities.Type;
-import Utilities.Direction;
-import Utilities.Color;
-
-import java.util.List;
 import java.util.Optional;
 
 import static Core.Board.playerStartPositions;
 
-public class Token implements Cloneable {
+public class Token {
     private int tokenId;
     private Player owner;
     private Cell currentCell;
@@ -47,36 +42,6 @@ public class Token implements Cloneable {
     public void setCurrentCell(Cell currentCell) {
         this.currentCell = currentCell;
     }
-    @Override
-    public Token clone() {
-        try {
-            return (Token) super.clone();
-        } catch (CloneNotSupportedException e) {
-            throw new AssertionError("Cloning not supported", e);
-        }
-    }
-
-//    public void initializeTokensInHome(Player player) {
-//
-//        List<Token> tokens = player.getTokens();
-//        Color playerColor = player.getColor();
-//        int tokenIndex = 0;
-//
-//        for (int i = 0; i < rows; i++) {
-//            for (int j = 0; j < cols; j++) {
-//                // Assign tokens to the first four `HOME` cells of the player's color
-//                if (grid[i][j].getType() == Type.HOME && grid[i][j].getColor() == playerColor) {
-//                    if (tokenIndex < tokens.size()) {
-//                        Token token = tokens.get(tokenIndex);
-//                        token.setCurrentCell(grid[i][j]);
-//                        grid[i][j].addToken(token);
-//                        tokenIndex++;
-//                    }
-//                }
-//            }
-//        }
-//    }
-
 
     public boolean canMove(int diceRoll, Board board) {
         if (owner.allTokensInHome() && diceRoll != 6) {
@@ -119,7 +84,7 @@ if(owner.allTokensInHome() && diceRoll==6){
             moveTokenFromHomeToStart(board);
             return;
         }
-//HERE THE PROBLEMMMMMMMMMMM
+
 
         System.out.println("ABOVE  moveToken ");
         int currentPos = getCurrentCellIndex(board);
@@ -222,19 +187,4 @@ if(owner.allTokensInHome() && diceRoll==6){
         }
     }
 
-/*ZAK*/
-public int getPosition() {
-    if (currentCell != null) {
-        // Convert 2D position (posX, posY) to a single position if needed.
-        // For example, assume the board has a fixed width (e.g., 10):
-        int boardWidth = 15; // Adjust this based on your board dimensions
-        return currentCell.getPosY() * boardWidth + currentCell.getPosX();
-    }
-    return -1; // Default if token is not on any cell
-}
-    // Method to return progress as distance covered from the start
-    public int getProgress() {
-    int startPosition =playerStartPositions[owner.getId()];
-        return getPosition() - startPosition;
-    }
 }

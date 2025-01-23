@@ -8,7 +8,7 @@ import java.sql.SQLOutput;
 import java.util.*;
 
 
-public class Game implements Cloneable{
+public class Game {
     private Board board;
     private List<Player> players;
     private int currentTurn;
@@ -24,33 +24,6 @@ public class Game implements Cloneable{
         dice = new Dice();
         isOver = false;
     }
-//==================ZAK NEW======================
-@Override
-public Game clone() {
-    try {
-        // Perform shallow copy
-        Game cloned = (Game) super.clone();
-
-        // Deep copy of the board
-        cloned.board = this.board.clone();
-
-        // Deep copy of the players
-        List<Player> clonedPlayers = new ArrayList<>();
-        for (Player player : this.players) {
-            clonedPlayers.add(player.clone());
-        }
-        cloned.players = clonedPlayers;
-
-        // Deep copy of the dice
-        cloned.dice = this.dice;
-
-        // Return the fully cloned Game object
-        return cloned;
-    } catch (CloneNotSupportedException e) {
-        throw new AssertionError("Cloning not supported", e);
-    }
-}
-
     public Game(Board board, List<Player> players, int currentTurn, Dice dice, boolean isOver) {
         this.board = board;
         this.players = players;
@@ -280,223 +253,14 @@ public Game clone() {
 
 
 
-    // ==========================================
-
-    private int expectiminimax(Board state, int depth, boolean isMaximizingPlayer) {
-        System.out.println("heheheehehhehe");
-        if (depth == 0 || isOver) {
-            return heuristic(state);
-        }
-
-        if (isMaximizingPlayer) {
-            int maxEval = Integer.MIN_VALUE;
-            for (Board nextState : getNextStates(state)) {
-                int eval = expectiminimax(nextState, depth - 1, false);
-                maxEval = Math.max(maxEval, eval);
-            }
-            return maxEval;
-        } else {
-            int expectedEval = 0;
-            int[] possibleOutcomes = { 1, 2, 3, 4, 5, 6 }; // Dice outcomes
-            for (int outcome : possibleOutcomes) {
-                dice.setFace(outcome); // Set the dice face
-                int eval = expectiminimax(state, depth - 1, true);
-                expectedEval += probability(outcome) * eval;
-            }
-            return expectedEval;
-        }
-    }
-
-    // Computer move logic for automated decision-making
-    public void computerMove() {
-        Player currentPlayer = players.get(currentTurn);
-        int bestMove = -1;
-        int maxEval = Integer.MIN_VALUE;
-        int consecutiveSixes = 0;
-            dice.rollDice();
-            System.out.println(currentPlayer.getName() + " rolled a " + dice.getFace());
-
-//            if (dice.getFace() == 6) {
-//                consecutiveSixes++;
-//                if (consecutiveSixes == 3) {
-//                    System.out.println("You rolled three 6s in a row. Turn forfeited!");
-//                    return;
-//                }
-//            } else {
-//                consecutiveSixes = 0; // Reset counter if not a 6
-//            }
-//
-//            System.out.println("currentPlayer.allTokensInHome() " + currentPlayer.allTokensInHome());
-//            if (dice.getFace() != 6 && currentPlayer.allTokensInHome()) {
-//                System.out.println("No available moves.");
-//                return; // Exit if no valid moves
-//            }
-//
-//            if (dice.getFace() == 6 && currentPlayer.allTokensInHome()) {
-//                currentPlayer.tokens.getFirst().moveToken(dice.getFace(),board);
-//                return; // Exit if no valid moves
-//            }
-//
-//            System.out.println("Choose the position of the token you want to move:");
-////            currentPlayer.getTokens()
-////                    .forEach(token ->
-////                            System.out.println("The Available Token To Move: X = "
-////                                    + token.getCurrentCell().getPosX()
-////                                    + ", Y = "
-////                                    + token.getCurrentCell().getPosY()
-////                            + "TOKEN TYPE" + token.getCurrentCell().getType())
-////                    );
-//        int[] position = new int[2];
-//
-//            currentPlayer.getTokens().stream()
-//                    .filter(token -> !token.getCurrentCell().isHome())
-//                    .forEach(token ->{
-//                        System.out.println("The Available Token To Move: X = "
-//                                + token.getCurrentCell().getPosX()
-//                                + ", Y = "
-//                                + token.getCurrentCell().getPosY());
-//                        position[0] = token.getCurrentCell().getPosX();
-//                        position[1] = token.getCurrentCell().getPosY();
-//                            }
-//
-//                    );
-//
-//
-//            if (board.getCellIndex(position[0],  position[1]) != -1) {
-//                currentPlayer.tokens.getFirst().moveToken(dice.getFace(),board);
-//            } else {
-//                System.out.println("Invalid position. Try again.");
-////                continue; // Ask for input again if invalid position
-//            }
-//
-//            checkWinCondition();
-
-//            if (dice.getFace() != 6) {
-//                break; // End the turn if dice rolled a number other than 6
-//            }
-        for (Token token : currentPlayer.getTokens()) {
-
-            System.out.println("==========================================================");
-            System.out.println(currentPlayer.getName() + "can't Move");
-            System.out.println("==========================================================");
-
-//            if (token.canMove(dice.getFace(), board)) {
-//                System.out.println("==========================================================");
-//                System.out.println(currentPlayer.getName() + "can Move");
-//                System.out.println("==========================================================");
-//
-////                token.moveToken(dice.getFace(), board);
-//
-//
-//            }
-            int eval = expectiminimax(board, 3, false); // Depth of 3 for decision-making
-            if (eval > maxEval) {
-                maxEval = eval;
-                bestMove = token.getTokenId();
-            }
-        }
-
-        if (bestMove != -1) {
-            currentPlayer.getTokens().get(bestMove).moveToken(dice.getFace(), board);
-            System.out.println(currentPlayer.getName() + " moved token " + bestMove);
-        } else {
-            System.out.println(currentPlayer.getName() + " has no valid moves.");
-        }
-    }
-
-    // Heuristic function to evaluate the game state
-    private int heuristic(Board state) {
-        int score = 0;
-        for (Player player : players) {
-            for (Token token : player.getTokens()) {
-                int position = board.getCellIndex(token.getCurrentCell().getPosX(), token.getCurrentCell().getPosY());
-                if (position != -1) {
-                    score += position; // Higher position = better progress
-                }
-                if (token.getCurrentCell().isHome()) {
-                    score += 100; // Bonus for tokens in HOME
-                }
-                if (token.getCurrentCell().isGoal()) {
-                    score += 500; // Higher bonus for tokens reaching the goal
-                }
-            }
-        }
-        return score;
-    }
-
-    // Get all possible next states based on the current game state
-    public List<Board> getNextStates(Board currentState) {
-        List<Board> nextStates = new ArrayList<>();
-        Player currentPlayer = players.get(currentTurn);
-        for (Token token : currentPlayer.getTokens()) {
-            if (token.canMove(dice.getFace(), board)) {
-//                Board clonedState = currentState;
-                token.moveToken(dice.getFace(), board);
-                nextStates.add(board);
-            }
-        }
-        return nextStates;
-    }
-    // Generate possible next states (update from private to public)
-    public List<Game> getNextStates1() {
-        if (players.isEmpty()) {
-            throw new IllegalStateException("No players available in the game.");
-        }
-
-        if (currentTurn < 0 || currentTurn >= players.size()) {
-            throw new IllegalStateException("Invalid currentTurn index: " + currentTurn);
-        }
-
-        Player currentPlayer = players.get(currentTurn);
-
-        List<Game> nextStates = new ArrayList<>();
-
-        // Ensure the player has tokens to move
-        if (currentPlayer.getTokens().isEmpty()) {
-            System.out.println("No tokens available for player: " + currentPlayer);
-            return nextStates; // Return an empty list
-        }
-
-        for (Token token : currentPlayer.getTokens()) {
-            if (dice == null || dice.getFace() == 0) {
-                throw new IllegalStateException("Dice has not been rolled or has an invalid face value.");
-            }
-
-            if (token.canMove(dice.getFace(), board)) {
-                Game nextState = clone(); // Create a copy of the current game state
-                token.moveToken(dice.getFace(), board); // Simulate a move
-                nextStates.add(nextState);
-            }
-        }
-
-        return nextStates;
-    }
-
-
-    // Probability of a particular dice outcome (uniform distribution)
-    public double probability(int outcome) {
-        return 1.0 / 6.0; // Equal probability for each dice face
-    }
-
-/*===============Zak new=====================*/
-    // Evaluate the game state using a heuristic
-    public int evaluateState() {
-        Player currentPlayer = players.get(currentTurn);
-        int score = 0;
-        for (Token token : currentPlayer.getTokens()) {
-            score += token.getProgress(); // Example heuristic: Sum of token progress
-        }
-        return score;
-    }
-//==================Zak new2=================
+// ================================================================================= ALGORITHIM ===================================================================================
 private void playComputerMove() {
     int bestScore = Integer.MIN_VALUE;
     int bestRow = -1;
     int bestCol = -1;
     Player currentPlayer = players.get(currentTurn);
 
-    int outcome =dice.rollDice();
-    dice.setFace(outcome);
+    dice.rollDice();
     System.out.println(currentPlayer.getName() + " rolled a " + dice.getFace());
 
     for (Token token : currentPlayer.getTokens()) {

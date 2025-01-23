@@ -2,14 +2,11 @@ package Core;
 
 import Utilities.Color;
 import Utilities.Type;
-import java.util.*;
-public class Board implements Cloneable{
+public class Board {
 
     Cell[] board;
     public static final int[] playerStartPositions = {0, 13, 26, 40};
     Cell[][] homePaths;
-/*=======================Zak new======================*/
-private List<Cell> cells;
 
     public Cell[] getBoard() {
         return board;
@@ -314,22 +311,4 @@ private List<Cell> cells;
         }
     }
 
-/*==============Zak new====================*/
-public Board clone() {
-    try {
-        // Perform shallow copy
-        Board cloned = (Board) super.clone();
-
-        // Deep copy of internal structure
-        List<Cell> clonedCells = new ArrayList<>();
-        for (Cell cell : this.board) {
-            clonedCells.add(cell.clone()); // Assuming Cell has a clone method
-        }
-        cloned.cells = clonedCells;
-
-        return cloned;
-    } catch (CloneNotSupportedException e) {
-        throw new AssertionError("Cloning not supported", e);
-    }
-}
 }

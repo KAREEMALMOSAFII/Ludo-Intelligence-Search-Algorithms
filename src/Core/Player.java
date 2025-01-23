@@ -3,7 +3,7 @@ package Core;
 import Utilities.Color;
 
 import java.util.*;
-public class Player implements Cloneable {
+public class Player{
 
     private int id;
     private String name;
@@ -55,18 +55,4 @@ public class Player implements Cloneable {
         return getTokens().stream().allMatch(token -> token.getCurrentCell().isHome());
     }
 
-    @Override
-    public Player clone() {
-        try {
-            Player cloned = (Player) super.clone();
-            List<Token> clonedTokens = new ArrayList<>();
-            for (Token token : this.tokens) {
-                clonedTokens.add(token.clone());
-            }
-            cloned.tokens = clonedTokens;
-            return cloned;
-        } catch (CloneNotSupportedException e) {
-            throw new AssertionError("Cloning not supported", e);
-        }
-    }
 }
