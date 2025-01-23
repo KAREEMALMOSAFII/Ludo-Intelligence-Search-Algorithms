@@ -1,10 +1,5 @@
 package Core;
 
-import Utilities.Type;
-import Utilities.Direction;
-import Utilities.Color;
-
-import java.util.List;
 import java.util.Optional;
 
 import static Core.Board.homePaths;
@@ -49,18 +44,9 @@ public class Token {
         this.currentCell = currentCell;
     }
 
-    public boolean canMove(int diceRoll, Board board) {
-        if (owner.allTokensInHome() && diceRoll != 6) {
-         return  false;
-        }
+    public boolean canMove(int diceRoll, Board board, int pos) {
 
-if(owner.allTokensInHome() && diceRoll==6){
-    return true;
-}
-        System.out.println("ABOVE CAN MOVE ");
-        int currentPos = getCurrentCellIndex(board);
-
-       int currentPos = pos;
+        int currentPos = pos;
         int targetPos = (currentPos + diceRoll) % 52;
 
         //TODO WE DIDI REACH IT
@@ -69,7 +55,7 @@ if(owner.allTokensInHome() && diceRoll==6){
             int intermediatePos = (currentPos + i) % 52;
             Cell cell = board.getBoard()[intermediatePos];
             if (cell.getTokens() != null &&
-                    cell.getTokens().stream().filter(t -> t.getOwner()!=owner).count() >= 2) {
+                    cell.getTokens().stream().filter(t -> t.getOwner() != owner).count() >= 2) {
                 return false;
             }
         }
@@ -77,21 +63,20 @@ if(owner.allTokensInHome() && diceRoll==6){
         return true;
     }
 
-    public void moveToken(int diceRoll, Board board,Integer posX,Integer posY, boolean isHome) {
-
+    public void moveToken(int diceRoll, Board board, Integer posX, Integer posY, boolean isHome) {
+        int currentPos = board.getCellIndex(posX, posY);
         // Move token from home if all tokens are in home and dice roll is 6
         if (isHome) {
             System.out.println("START LOGIC: Moving token from home to start.");
             moveTokenFromHomeToStart(board);
             return;
         }
-        if (!canMove(diceRoll, board)) {
+        if (!canMove(diceRoll, board, currentPos)) {
             System.out.println("Token cannot move.");
             return;
         }
 
 
-        int currentPos = board.getCellIndex(posX,posY);
         int playerId = owner.getId();
         int nearestSafeZone = (playerStartPositions[playerId] + 50) % 52; // Corrected nearest safe zone calculation
 
@@ -119,16 +104,10 @@ if(owner.allTokensInHome() && diceRoll==6){
         }
 
         // Normal movement logic if not near a safe zone
-        if (!canMove(diceRoll, board,currentPos)) {
+        if (!canMove(diceRoll, board, currentPos)) {
             System.out.println("Token cannot move.");
             return;
         }
-
-
-        // Calculate target position on the board (handling circular movement)
-
-        System.out.println("ABOVE  moveToken ");
-        int currentPos = getCurrentCellIndex(board);
         //int targetPos = (currentPos + diceRoll);
         //THERE IS A BUGTODO
         int targetPos = (currentPos + diceRoll) % 52;
@@ -141,7 +120,7 @@ if(owner.allTokensInHome() && diceRoll==6){
         board.getBoard()[targetPos].addToken(this);
         currentCell = board.getBoard()[targetPos];
 
-       // board.printBoard();
+        // board.printBoard();
     }
 
     private int getCurrentCellIndex(Board board) {
@@ -183,7 +162,7 @@ if(owner.allTokensInHome() && diceRoll==6){
                 startCell.setText(owner.getColor());
                 token.setCurrentCell(startCell);  // Update the correct token's position
                 System.out.println("new Cell Type " + token.getCurrentCell().getType());
-                startCell.getTokens().forEach(s-> System.out.println("token pos x " + s.getCurrentCell().getPosX()+ " token pos y " + s.getCurrentCell().getPosY()));
+                startCell.getTokens().forEach(s -> System.out.println("token pos x " + s.getCurrentCell().getPosX() + " token pos y " + s.getCurrentCell().getPosY()));
 
             } else {
                 throw new IllegalStateException("Start cell is null for player " + owner.getId());

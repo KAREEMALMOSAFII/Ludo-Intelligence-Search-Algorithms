@@ -119,6 +119,8 @@ public class Game {
                 players.add(computer4);
                 break;
         }
+        if(numOfPlayers==1)
+        {
         while (!getIsOver()) {
             System.out.println("Player Turn");
             playerMove();
@@ -126,23 +128,27 @@ public class Game {
             switchTurn();
             board.printBoard();
 
-            for (int i = 0; i < players.size() -1 ; i++) {
+            for (int i = 0; i < players.size() - 1; i++) {
                 System.out.println("Computer Turn");
                 playerMove();
-              //  computerMove();
+                //  computerMove();
                 checkWinCondition();
                 switchTurn();
                 board.printBoard();
             }
         }
-        case 2 :
-        for (int i = 0; i < players.size(); i++) {
-            // computerMove();
-            playComputerMove();
-            checkWinCondition();
-            switchTurn();
-            board.printBoard();
         }
+        else {
+            for (int i = 0; i < players.size(); i++) {
+                // computerMove();
+                playComputerMove();
+                checkWinCondition();
+                switchTurn();
+                board.printBoard();
+            }
+        }
+
+
         System.out.println("Game Over");
     }
 
@@ -382,7 +388,7 @@ private void playComputerMove() {
 
     for (Token token : currentPlayer.getTokens()) {
 
-        if (token.canMove(dice.getFace(),board)) {
+        if (token.canMove(dice.getFace(),board,)) {
             System.out.println("can move======================");
 
 if(currentPlayer.allTokensInHome() && dice.getFace()==6){
@@ -401,7 +407,7 @@ else {
 
 }
 
-            token.moveToken(dice.getFace(),board);
+            token.moveToken(dice.getFace(),board,token.getCurrentCell().getPosX(),token.getCurrentCell().getPosY(),false);
 
             System.out.println("FROM COMPUTER MOVE");
             board.printBoard();
@@ -438,7 +444,7 @@ else {
 
         if (maximizingPlayer) {
             int maxEval = Integer.MIN_VALUE;
-                if (token.canMove(dice.getFace(),board)) {
+                if (token.canMove(dice.getFace(),board,)) {
                     if(currentPlayer.allTokensInHome() && dice.getFace()==6){
 //    board.getBoard()[].addToken(token);
                         token.moveTokenFromHomeToStart(board);
@@ -471,8 +477,8 @@ else {
         } else {
             int minEval = Integer.MAX_VALUE;
 
-                if (token.canMove(dice.getFace(),board)) {
-                    int position = board.getCellIndex(token.getCurrentCell().getPosX(), token.getCurrentCell().getPosY());
+            int position = board.getCellIndex(token.getCurrentCell().getPosX(), token.getCurrentCell().getPosY());
+                if (token.canMove(dice.getFace(),board,position)) {
                     System.out.println("ttttttt"+position);
 
                     if(currentPlayer.allTokensInHome() && dice.getFace()==6){
@@ -489,7 +495,7 @@ else {
                             return Integer.MIN_VALUE; // Handle invalid position if needed
                         }
                     }
-                    token.moveToken(dice.getFace(),board);
+                    token.moveToken(dice.getFace(),board,token.getCurrentCell().getPosX(),token.getCurrentCell().getPosY(),false);
 
 
                     System.out.println("FROM MIN");
