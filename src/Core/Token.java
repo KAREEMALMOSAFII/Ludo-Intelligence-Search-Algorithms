@@ -49,35 +49,15 @@ public class Token {
         this.currentCell = currentCell;
     }
 
-//    public void initializeTokensInHome(Player player) {
-//
-//        List<Token> tokens = player.getTokens();
-//        Color playerColor = player.getColor();
-//        int tokenIndex = 0;
-//
-//        for (int i = 0; i < rows; i++) {
-//            for (int j = 0; j < cols; j++) {
-//                // Assign tokens to the first four `HOME` cells of the player's color
-//                if (grid[i][j].getType() == Type.HOME && grid[i][j].getColor() == playerColor) {
-//                    if (tokenIndex < tokens.size()) {
-//                        Token token = tokens.get(tokenIndex);
-//                        token.setCurrentCell(grid[i][j]);
-//                        grid[i][j].addToken(token);
-//                        tokenIndex++;
-//                    }
-//                }
-//            }
-//        }
-//    }
+    public boolean canMove(int diceRoll, Board board, int pos) {
+        if (owner.allTokensInHome() && diceRoll != 6) {
+            return  false;
+        }
 
-
-    public boolean canMove(int diceRoll, Board board,int pos) {
-//        if (owner.allTokensInHome() && diceRoll != 6) {
-//            return false;
-//        }
-
-
-       int currentPos = pos;
+        if(owner.allTokensInHome() && diceRoll==6){
+            return true;
+        }
+        int currentPos = pos;
         int targetPos = (currentPos + diceRoll) % 52;
 
         //TODO WE DIDI REACH IT
@@ -86,7 +66,7 @@ public class Token {
             int intermediatePos = (currentPos + i) % 52;
             Cell cell = board.getBoard()[intermediatePos];
             if (cell.getTokens() != null &&
-                    cell.getTokens().stream().filter(t -> t.getOwner()!=owner).count() >= 2) {
+                    cell.getTokens().stream().filter(t -> t.getOwner() != owner).count() >= 2) {
                 return false;
             }
         }
@@ -94,7 +74,9 @@ public class Token {
         return true;
     }
 
-    public void moveToken(int diceRoll, Board board,Integer posX,Integer posY, boolean isHome) {
+    public void moveToken(int diceRoll, Board board, Integer posX, Integer posY, boolean isHome) {
+        int currentPos = getCurrentCellIndex(board);
+//        int currentPos = board.getCellIndex(posX, posY);
 
         // Move token from home if all tokens are in home and dice roll is 6
         if (isHome) {
@@ -102,9 +84,19 @@ public class Token {
             moveTokenFromHomeToStart(board);
             return;
         }
+        /*******************************************************/
+        if (owner.allTokensInHome() && diceRoll == 6) {
+            System.out.println("STARTLOGIC");
+            moveTokenFromHomeToStart(board);
+            return;
+        }
+
+        if (!canMove(diceRoll, board, currentPos)) {
+            System.out.println("Token cannot move.");
+            return;
+        }
 
 
-        int currentPos = board.getCellIndex(posX,posY);
         int playerId = owner.getId();
         int nearestSafeZone = (playerStartPositions[playerId] + 50) % 52; // Corrected nearest safe zone calculation
 
@@ -132,13 +124,12 @@ public class Token {
         }
 
         // Normal movement logic if not near a safe zone
-        if (!canMove(diceRoll, board,currentPos)) {
+        if (!canMove(diceRoll, board, currentPos)) {
             System.out.println("Token cannot move.");
             return;
         }
-
-
-        // Calculate target position on the board (handling circular movement)
+        //int targetPos = (currentPos + diceRoll);
+        //THERE IS A BUGTODO
         int targetPos = (currentPos + diceRoll) % 52;
 
         System.out.println("Current position: " + currentPos);
@@ -149,10 +140,10 @@ public class Token {
         board.getBoard()[targetPos].addToken(this);
         currentCell = board.getBoard()[targetPos];
 
-       // board.printBoard();
+        board.printBoard();
     }
 
-    private int getCurrentCellIndex(Board board) {
+    public int getCurrentCellIndex(Board board) {
         System.out.println(currentCell.getPosX() + "   " + currentCell.getPosY());
         for (int i = 0; i < board.getBoard().length; i++) {
             if (board.getCellIndex(currentCell.getPosX(), currentCell.getPosY()) != -1) {
@@ -160,7 +151,7 @@ public class Token {
                 return board.getCellIndex(currentCell.getPosX(), currentCell.getPosY());
             }
         }
-        System.out.println("NOTTFOUNED  ");
+        System.out.println("NOT TFOUNED  ");
         return -1; // Not found
     }
 
@@ -191,7 +182,7 @@ public class Token {
                 startCell.setText(owner.getColor());
                 token.setCurrentCell(startCell);  // Update the correct token's position
                 System.out.println("new Cell Type " + token.getCurrentCell().getType());
-                startCell.getTokens().forEach(s-> System.out.println("token pos x " + s.getCurrentCell().getPosX()+ " token pos y " + s.getCurrentCell().getPosY()));
+                startCell.getTokens().forEach(s -> System.out.println("token pos x " + s.getCurrentCell().getPosX() + " token pos y " + s.getCurrentCell().getPosY()));
 
             } else {
                 throw new IllegalStateException("Start cell is null for player " + owner.getId());
